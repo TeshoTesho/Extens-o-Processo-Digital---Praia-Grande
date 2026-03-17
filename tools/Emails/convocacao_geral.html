@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de E-mail - Convoca&ccedil;&atilde;o Digital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f4f4f4;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="date"], textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #email_gerado {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #ffffff;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            font-family: monospace;
+            position: relative; /* Para posicionar o botão de copiar */
+        }
+        #email_gerado h2{
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .data-manual {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        #copiar_email {
+            position: absolute;
+            top: 10px;
+            right: 130px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+        #copiar_email:hover {
+            background-color: #367c39;
+        }
+        #copiar_email:active {
+            background-color: #2b5e2e;
+        }
+        #selecionar_email {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+        #selecionar_email:hover {
+            background-color: #0056b3;
+        }
+        #selecionar_email:active {
+            background-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convocação para assinatura de Termos/Contratos (Assinatura Digital)</h1>
+
+    <form id="convocacao_digital_form">
+        <label for="objeto_termo_1">Objeto do termo. EX.: Termo de Ata para Registro de Pre&ccedil;os...:</label>
+        <input type="text" id="objeto_termo_1" name="objeto_termo_1" required value='TERMO DE ATA PARA '>
+
+        <label for="modalidade_licitacao_1">Modalidade da licita&ccedil;&atilde;o. EX.: Preg&atilde;o Eletr&ocirc;nico 
+
+n&ordm;. 060/2024:</label>
+        <input type="text" id="modalidade_licitacao_1" name="modalidade_licitacao_1" required value='Pregão Eletrônico nº '>
+
+        <label for="numero_processo_1">N&uacute;mero do processo:</label>
+        <input type="text" id="numero_processo_1" name="numero_processo_1" required>
+
+        <label for="data_inicio_1">Data de In&iacute;cio:</label>
+        <input type="date" id="data_inicio_1" name="data_inicio_1" readonly>
+
+        <div class="data-manual">
+            <label for="data_fim_manual">Data de Fim:</label>
+            <input type="date" id="data_fim_automatica" name="data_fim_automatica" readonly>
+            <input type="checkbox" id="data_fim_manual_check" name="data_fim_manual_check">
+            <label for="data_fim_manual_check">Inserir data manualmente</label>
+            <input type="date" id="data_fim_manual" name="data_fim_manual" class="hidden">
+        </div>
+
+        <button type="button" id='GerarMail'>Gerar E-mail</button>
+    </form>
+
+    <div id="email_gerado" class="hidden">
+        <h2></h2> <div id="titulo_email"></div>
+        <div id="output_email"></div>
+        <button id="copiar_email" id='CopyMail'>Copiar sem formatação</button>
+        <button id="selecionar_email" id='SelectMail'>Selecionar tudo</button>
+    </div>
+
+<script src="convocacao_geral.js"></script>
+</body>
+</html>

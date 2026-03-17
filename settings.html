@@ -1,0 +1,354 @@
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+              <meta charset="utf-8">
+              <title>Configurações da Extensão</title>
+
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+              <link rel="stylesheet" href="css/sweetalert2.min.css">
+
+              <link href="css/bootstrap.min.css" rel="stylesheet">
+              <style>
+                body {
+                  font-family: "Segoe UI", Arial, sans-serif;
+                  background: #f5f6fa;
+                  color: #333;
+                  margin: 0;
+                  padding: 0;
+                  min-width: 400px;
+                }
+
+                header nav a:hover {
+                  background: rgba(255,255,255,0.35) !important;
+                }
+
+
+                .container {
+                  padding: 18px;
+                }
+
+                .card {
+                  background: #fff;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                  margin-bottom: 20px;
+                  padding: 16px;
+                }
+
+                .card h4 {
+                  margin: 0 0 12px 0;
+                  font-size: 15px;
+                  color: #1976d2;
+                  padding-bottom: 6px;
+                }
+
+                .setting-item {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin: 8px 0;
+                }
+
+                .setting-label {
+                  font-size: 14px;
+                }
+
+                .switch {
+                  position: relative;
+                  display: inline-block;
+                  width: 45px;
+                  height: 25px;
+                }
+                .switch input {
+                  opacity: 0;
+                  width: 0;
+                  height: 0;
+                }
+                .slider {
+                  position: absolute;
+                  cursor: pointer;
+                  top: 0; left: 0; right: 0; bottom: 0;
+                  background-color: #ccc;
+                  transition: .4s;
+                  border-radius: 25px;
+                }
+                .slider:before {
+                  position: absolute;
+                  content: "";
+                  height: 17px;
+                  width: 17px;
+                  left: 4px;
+                  bottom: 4px;
+                  background-color: white;
+                  transition: .4s;
+                  border-radius: 50%;
+                }
+                input:checked + .slider {
+                  background-color: #1976d2;
+                }
+                input:checked + .slider:before {
+                  transform: translateX(20px);
+                }
+
+                /* Lista de tags */
+                #predefinedTagsList {
+                  list-style: none;
+                  padding: 0;
+                  margin: 0;
+                  max-height: 180px;
+                  overflow-y: auto;
+                  border: 0px solid #ddd;
+                  border-radius: 6px;
+                  background: #fafafa;
+                }
+
+                #predefinedTagsList li {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 6px 10px;
+                  border-bottom: none;
+                }
+
+                #predefinedTagsList li:last-child {
+                  border-bottom: none;
+                }
+
+                #addTagForm {
+                  display: flex;
+                  gap: 8px;
+                  margin-bottom: 10px;
+                }
+
+                #addTagForm input[type="text"] {
+                  flex-grow: 1;
+                  padding: 6px 8px;
+                  border: 1px solid #ccc;
+                  border-radius: 4px;
+                }
+
+                #addTagForm input[type="color"] {
+                  height: 34px;
+                  width: 45px;
+                  border-radius: 4px;
+                  border: 1px solid #ccc;
+                }
+
+                #addTagBtn {
+                  background: #198754;
+                  color: #fff;
+                  border: none;
+                  padding: 6px 10px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                }
+
+                #addTagBtn:hover { background: #157347; }
+
+                .backup-actions {
+                  display: flex;
+                  gap: 8px;
+                  margin-top: 10px;
+                }
+
+                .backup-actions button {
+                  flex: 1;
+                  border: none;
+                  border-radius: 4px;
+                  padding: 8px 10px;
+                  font-size: 13px;
+                  cursor: pointer;
+                }
+
+
+
+                footer {
+                  text-align: center;
+                  font-size: 12px;
+                  color: #999;
+                  margin-bottom: 10px;
+                }
+
+                .card-header{
+                  background-color: #fff;
+                }
+
+              </style>
+            </head>
+            <body>
+              <header class="bg-primary text-white py-1">
+                <div class="container text-center">
+
+
+
+                  <h3 class="mt-1 mb-1">Configurações</h3>
+
+                </div>
+              </header>
+
+
+
+              <div class="container">
+
+
+
+                <div class="card">
+                  <h4>Geral</h4>
+                  <div class="setting-item">
+                    <span class="setting-label">Ordenar processos na página inicial</span>
+                    <label class="switch"><input type="checkbox"  id="sortHomepage"><span class="slider"></span></label>
+                  </div>
+                  <div class="setting-item">
+                    <span class="setting-label">Ordenar processos nas pastas</span>
+                    <label class="switch"><input type="checkbox" id="sortFolders"><span class="slider"></span></label>
+                  </div>
+                  <div class="setting-item">
+                    <span class="setting-label">Mostrar Tags Coloridas</span>
+                    <label class="switch"><input type="checkbox" id="showTags"><span class="slider"></span></label>
+                  </div>
+                  <div class="setting-item">
+                    <span class="setting-label">
+                      <span id="themeText">Modo Escuro</span> 
+                      <i id="themeIcon" class="fa-regular fa-moon text-dark"></i>
+                    </span>
+                    <label class="switch">
+                      <input type="checkbox" id="darkMode">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-item">
+                    <span class="setting-label">Opções do Menu</span>
+                    <select id="menuType" style="padding:6px;border:1px solid #ccc;border-radius:4px;" class='bg-white text-dark'>
+                      <option value="Simples">Simples</option>
+                      <option value="Avancado">Avançado (Com Tags Rápidas)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header border-0 border bg-white " id="headingTags" style="padding: 0;">
+                    <button class="btn btn-link w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTags" aria-expanded="false" aria-controls="collapseTags" style="
+                    text-decoration: none;
+                    color: inherit; /* Mantém a cor original do texto */
+                    font-weight: inherit; /* Mantém a fonte original */
+                    padding: 0.5rem 1rem; /* Padding para a área clicável */
+                    ">
+                    <h4>Tags Rápidas</h4>
+                  </button>
+
+                </div>
+
+                <div id="collapseTags" class="collapse" aria-labelledby="headingTags">
+                  <div class="card-body gap-1 " style="padding: 0;">
+
+                    <form id="addTagForm" >
+                      <input type="text" id="newTagName" class='bg-white text-dark' placeholder="Nome da Tag">
+                      <input type="color" id="newTagColor" class='bg-white text-dark' value="#0d6efd">
+                      <button type="button" id="addTagBtn" ><i class="fa fa-plus"></i></button>
+                    </form>
+
+                    <ul id="predefinedTagsList" class='bg-white text-dark'></ul>
+                    <p id="noTagsMessage" style="font-size:13px;color:#777;text-align:center;display:none;">Nenhuma tag rápida definida.</p>
+
+                    <div class="backup-actions">
+                      <button id="exportTagsBtn" class='bg-primary text-white'><i class="fa fa-download"></i> Exportar</button>
+                      <input type="file" id="importFile" accept="application/json" style="display:none;">
+                      <button id="importTagsBtn" class='bg-warning text-white'><i class="fa fa-upload"></i> Importar</button>
+                    </div>
+                    <p id="importMessage" class="note" style="margin-top:8px;display:none;"></p>
+
+                  </div>
+                </div>
+              </div>
+              <div class="card mb-3 d-none">
+                <h4><i class="fa fa-arrows-alt me-2"></i>Posicionamento das Etiquetas</h4>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="fw-bold d-block">Modo de Inserção</span>
+                    <small class="text-muted">Personalizado</small>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="tagPosition">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="fw-bold d-block">Posição Vertical</span>
+                    <small class="text-muted">Em baixo do card</small>
+                  </div>
+                  <label class="switch ">
+                    <input type="checkbox" id="tagPositionV">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="fw-bold d-block">Alinhamento Horizontal</span>
+                    <small class="text-muted">Alinhado a Direita</small>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="tagPositionH">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </div>
+              <nav class="">
+                <div class="d-flex justify-content-center gap-1 flex-wrap">
+
+                  <a href="kanban.html" target="_blank" class="btn btn-sm text-black px-3" data-toggle="tooltip" data-placement="top" title="Kanban"
+                  style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+                  <i class="fa fa-table-columns me-1"></i> <span class="btn-text">Kanban</span>
+                </a>
+
+                <a href="lista.html" target="_blank" class="btn btn-sm text-black px-3" data-toggle="tooltip" data-placement="top" title="Gestão Digital"
+                style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+                <i class="fa-solid fa-cloud-arrow-up me-1"></i> <span class="btn-text">Gestão Digital</span>
+              </a>
+
+              <a href="lista_assinador.html" target="_blank" class="btn btn-sm text-black px-3" data-toggle="tooltip" data-placement="top" title="Assinador Digital"
+              style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+              <i class="fa-solid fa-signature me-1"></i> <span class="btn-text">Assinador Digital/span>
+              </a>
+
+              <a href="tools.html" class="btn btn-sm text-black px-3" data-toggle="tooltip" data-placement="top" title="Ferramentas"
+              style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+              <i class="fa-solid fa-tools me-1" aria-hidden="true"></i> <span class="btn-text">Ferramentas</span>
+            </a>
+
+
+
+            <a href="tags-order.html" target="_blank" class="btn btn-sm text-black px-3 d-none" data-toggle="tooltip" data-placement="top" title="Tags - Order"
+            style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+            <i class="fa fa-bookmark me-1"></i> <span class="btn-text">Tags - Order</span>
+          </a>
+
+
+          <a href="pages/tags.html" target="_blank" class="btn btn-sm text-black px-3 d-none" data-toggle="tooltip" data-placement="top" title="Tags - List"
+          style="background: rgba(255,255,255,0.1); border-radius: 6px; border-color: #000;">
+          <i class="fa fa-bookmark me-1"></i> <span class="btn-text">Tags - List</span>
+        </a>
+
+
+
+
+
+      </div>
+    </nav>
+
+
+  </div>
+
+  <footer class="text-center text-muted mt-1" id="extInfo" style="font-size: 0.9rem;"r>Versão 1.0 • ©Gerenciador Processo Digital </footer>
+
+  <script src="js/sweetalert2.min.js"></script>
+  <script src="settings.js"></script>
+
+  <script src="theme.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+</body>
+</html>

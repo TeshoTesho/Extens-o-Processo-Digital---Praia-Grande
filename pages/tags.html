@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Visualizador de Tags Salvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="../../css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .tag-color {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-right: 6px;
+    }
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    th.sortable:hover {
+      background-color: #495057 !important;
+    }
+    .sort-icon {
+      font-size: 0.8rem;
+      margin-left: 4px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container my-4">
+    <h1 class="text-center mb-4">📋 Tags e Processos Salvos</h1>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col" class="sortable" data-column="processNumber">
+                  Processo <span class="sort-icon">↕</span>
+                </th>
+                <th scope="col" class="sortable" data-column="name">
+                  Tag <span class="sort-icon">↕</span>
+                </th>
+                <th scope="col" class="sortable" data-column="color">
+                  Cor <span class="sort-icon">↕</span>
+                </th>
+                <th scope="col" class="sortable" data-column="id">
+                  ID Interno <span class="sort-icon">↕</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="tagsTableBody">
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                  Carregando dados...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card-footer text-center">
+        <button id="refreshBtn" class="btn btn-primary">
+          🔄 Atualizar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="tags.js"></script>
+</body>
+</html>

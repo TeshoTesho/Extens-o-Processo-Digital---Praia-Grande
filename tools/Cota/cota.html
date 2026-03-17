@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário para Documento Word</title>
+    
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="../../css/sweetalert2.min.css">
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        /* Styling for the form container */
+        .formulario-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075); /* Subtle shadow */
+            margin-bottom: 20px; /* Space below the form */
+        }
+        /* A4 preview styles */
+        #preview-container {
+            /* Removed fixed width to allow Bootstrap column sizing */
+            min-height: 29.7cm; /* Minimum A4 height, allows content to grow */
+            margin: 0 auto 20px auto; /* Center horizontally, add bottom margin */
+            background-color: white;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15); /* More pronounced shadow */
+            padding: 2cm; /* Internal margins for A4 */
+            box-sizing: border-box; /* Ensures padding doesn't increase total size */
+            border: none; /* No border */
+        }
+        /* Autocomplete styles */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #ced4da; /* Bootstrap border color */
+            border-bottom: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff; /* Ensure background is white */
+            border-radius: 0 0 5px 5px; /* Rounded corners at the bottom */
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ced4da;
+        }
+        .autocomplete-items div:hover {
+            background-color: #f8f9fa; /* Light hover background */
+        }
+        .autocomplete-active {
+            background-color: #0d6efd !important; /* Bootstrap primary blue */
+            color: #fff;
+        }
+        /* Highlight for generated data */
+        .data-marker {
+            background-color: rgba(255, 255, 0, 0.3); /* Semi-transparent yellow highlight */
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+        }
+        .editable {
+            border: 1px dashed #ccc;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-8 formulario-container">
+                <h1 class="text-center mb-4 text-primary">Formulário para Documento Word</h1>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tipo de Processo:</label>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="processo_fisico" name="tipo_processo" value="fisico">
+                        <label class="form-check-label" for="processo_fisico">Físico</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="processo_digital" name="tipo_processo" value="digital" checked>
+                        <label class="form-check-label" for="processo_digital">Digital</label>
+                    </div>
+                </div>
+
+                <div id="processo_fisico_inputs" style="display: none;">
+                    <div class="mb-3">
+                        <label for="processo_folha" class="form-label fw-bold">Número da Folha da Cota:</label>
+                        <input type="text" id="processo_folha" class="form-control rounded" placeholder="Digite o número da folha da Cota">
+                    </div>
+                    <div class='row mb-3    '>
+                        <div class="col-6">
+                            <label for="processo_numero" class="form-label fw-bold">Número do Processo:</label>
+                            <input type="text" id="processo_numero" class="form-control rounded" placeholder="Digite o número do processo físico">
+                        </div>
+                        <div class="col-6">
+                            <label for="processo_ano" class="form-label fw-bold">Ano do Processo:</label>
+                            <input type="text" id="processo_ano" class="form-control rounded" placeholder="Digite o ano do processo físico">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mb-3 position-relative">
+                    <div class="row d-none">
+                        <div class="col">
+                            <label for="sigla_nome_destino" class="form-label fw-bold">À - Destino:</label>
+                            <input type="text" id="sigla_nome_destino" class="form-control rounded" placeholder="Digite a sigla, nome e destino" value='SEAD-511, Departamento de Administração, Diretor    '>
+                            <div id="sigla_nome_destino_list" class="autocomplete-items"></div>
+                        </div>
+                        <div class="col">
+                            <label for="sexo" class="form-label fw-bold">Sr. Sra.</label>
+                            <select id='sexo' class="form-control rounded">
+                                <option value="Sr.">Sr.</option>
+                                <option value="Sra.">Sra.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tipo de Termo</label>
+                    <select id="tipo_termo_select" class="form-select rounded">
+                        <option value="">Selecione o tipo de termo</option>
+                        <option value="ATA">Termo de ATA</option>
+                        <option value="PRORROGAÇÃO">Termo de Prorrogação</option>
+                        <option value="RET/RAT">Termo de RET/RAT</option>
+                        <option value="RERRAT">Termo de RERRAT</option>
+                        <option value="CONTRATO">Contrato</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Termo(s):</label>
+                    <div id="termo_ata_container">
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" class="form-control termo-ata-input me-2 rounded" placeholder="Digite o(s) termo(s)"> 
+                            <input type="text" class="form-control termo-empresa-input me-2 rounded" placeholder="Digite o nome da EMPRESA ou CONTRATADO">
+                            <button type="button" class="btn btn-success adicionar-termo-ata rounded-circle">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ano_termo_ata" class="form-label fw-bold">Ano do(s) Termo(s):</label>
+                    <input type="text" id="ano_termo_ata" class="form-control rounded" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Itens:</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="email_convocacao" name="itens" value="Email de Convocação">
+                                <label class="form-check-label" for="email_convocacao">Email de Convocação</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="relatorios" name="itens" value="Relatórios">
+                                <label class="form-check-label" for="relatorios">Relatórios</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="dom" name="itens" value="DOM">
+                                <label class="form-check-label" for="dom">DOM</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="dou" name="itens" value="DOU">
+                                <label class="form-check-label" for="dou">DOU</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="doe" name="itens" value="DOE">
+                                <label class="form-check-label" for="doe">DOE</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="errata" name="itens" value="ERRATA">
+                                <label class="form-check-label" for="errata">ERRATA</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="erro_siam" name="itens" value="Erro de Lançamento SIAM">
+                                <label class="form-check-label" for="erro_siam">Erro de Lançamento SIAM</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="relatorio_audesp" name="itens" value="Relatório AUDESP">
+                                <label class="form-check-label" for="relatorio_audesp">Relatório AUDESP</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="comunicacao_fornecimento" name="itens" value="Comunicação de Fornecimento">
+                                <label class="form-check-label" for="comunicacao_fornecimento">Comunicações de Fornecimento/Serviços</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="cota_seguinte" name="cota_seguinte" value="Cota Seguinte" >
+                    <label class="form-check-label" for="cota_seguinte">Cota Seguinte</label>
+                </div>
+
+                <button id="gerar-documento" class="btn btn-primary w-100 rounded">Gerar Documento</button>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-5">
+            <div class="col-8">
+                <button id="selecionar-texto-preview" class="btn btn-success mb-3 w-100 rounded">Selecionar Texto do Preview</button>
+                <h2 class="text-center mb-4 text-secondary">Preview do Documento</h2>
+                <div id="preview-container" class="bg-white">
+
+                    <div id="documento-preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="../../js/sweetalert2.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    <script src='cota.js'>
+
+<script src="theme.js"></script>
+    </script>
+</body>
+</html>

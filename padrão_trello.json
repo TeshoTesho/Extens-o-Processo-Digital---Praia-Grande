@@ -1,0 +1,103 @@
+{
+  "predefinedTags": [
+    {
+      "color": "#0f1593",
+      "name": "AF"
+    },
+    {
+      "color": "#2890ae",
+      "name": "FORMALIZANDO"
+    },
+    {
+      "color": "#2a8b9e",
+      "name": "ASSINADOR"
+    },
+    {
+      "color": "#2d858e",
+      "name": "CONVOCADO"
+    },
+    {
+      "color": "#2f807e",
+      "name": "PUBLICAÇÃO"
+    },
+    {
+      "color": "#327a6e",
+      "name": "JUNTADA"
+    },
+    {
+      "color": "#34755e",
+      "name": "AUDESP"
+    },
+    {
+      "color": "#376f4e",
+      "name": "ASSINATURA"
+    },
+    {
+      "color": "#247e30",
+      "name": "CONCLUIDO"
+    }
+  ],
+
+  "processTags": {
+    "102037-1763052335497": {
+      "color": "#b000c7",
+      "name": "TERMO DE AJUSTE",
+      "processNumber": "5.288/2025"
+    },
+    "102037-1763054905700": {
+      "color": "#6c757d",
+      "name": "Em análise",
+      "processNumber": "5.288/2025"
+    },
+    "112099-1763051752551": {
+      "color": "#0d6efd",
+      "name": "ASSINADOR",
+      "processNumber": "13.360/2025"
+    },
+    "135809-1763051778743": {
+      "color": "#b000c7",
+      "name": "TERMO DE AJUSTE",
+      "processNumber": "32.443/2025"
+    },
+    "141507-1762968495639": {
+      "color": "#919191",
+      "name": "FORMALIZAR",
+      "processNumber": "36.722/2025"
+    },
+    "141507-1762968508948": {
+      "color": "#00c7ba",
+      "name": "TERMO DE ATA",
+      "processNumber": "36.722/2025"
+    },
+    "143431-1763054066139": {
+      "color": "#4d0dfd",
+      "name": "AF",
+      "processNumber": "5.288/2025"
+    },
+    "64602-1763054997704": {
+      "color": "#0d6efd",
+      "name": "ASSINADOR",
+      "processNumber": "15.023/2024"
+    },
+    "73833-1763051792287": {
+      "color": "#0d6efd",
+      "name": "ASSINADOR",
+      "processNumber": "22.530/2024"
+    },
+    "75548-1763052203107": {
+      "color": "#0d6efd",
+      "name": "ASSINADOR",
+      "processNumber": "23.847/2024"
+    },
+    "81774-1763052271618": {
+      "color": "#b000c7",
+      "name": "TERMO DE PRORROGAÇÃO",
+      "processNumber": "16.056/2024-22"
+    },
+    "98578-1763052215066": {
+      "color": "#0d6efd",
+      "name": "ASSINADOR",
+      "processNumber": "2.335/2025"
+    }
+  }
+}

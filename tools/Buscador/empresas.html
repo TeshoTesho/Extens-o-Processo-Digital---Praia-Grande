@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Empresas</title>
+  <link href="../../css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../css/sweetalert2.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-4">
+        <div class="d-flex gap-2 mb-3">
+            <button class="btn btn-success" id="btnAbrirImportar">
+                <i class="fa fa-file-excel"></i> Importar Excel
+            </button>
+            <button class="btn btn-secondary" id="btnLimparDuplicados">
+                <i class="fa fa-broom"></i> Limpar Duplicados
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+            <h3><i class="fa-solid fa-building"></i> Empresas</h3>
+            <button class="btn btn-primary" id="btnNovaEmpresa">
+                <i class="fa fa-plus"></i> Nova Empresa
+            </button>
+        </div>
+
+        <input type="text" id="busca" class="form-control mb-3" placeholder="Buscar por Razão Social ou CNPJ">
+
+        <table class="table table-bordered table-hover bg-white">
+            <thead class="table-light">
+                <tr>
+                    <th>Razão Social</th>
+                    <th>CNPJ</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="lista"></tbody>
+        </table>
+
+        <div class="text-center my-4">
+            <button id="btnCarregarMais" class="btn btn-outline-primary" style="display: none;">
+                Carregar Mais...
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalImportarExcel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Importar Excel</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" id="arquivoExcel" class="form-control" accept=".xlsx,.xls">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" id="btnConfirmarImportacao" disabled>Importar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEmpresa">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Empresa</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="empresaId">
+                    <div class="row g-2">
+                        <div class="col-md-8"><input class="form-control" id="razaoSocial" placeholder="Razão Social"></div>
+                        <div class="col-md-4"><input class="form-control" id="abrev" placeholder="Abreviação"></div>
+                        <div class="col-md-6"><input class="form-control" id="cnpj" placeholder="CNPJ"></div>
+                        <div class="col-md-6"><input class="form-control" id="cep" placeholder="CEP"></div>
+                        <div class="col-12"><input class="form-control" id="endereco" placeholder="Endereço"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" id="btnSalvarEmpresa">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalResponsaveis">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Responsáveis</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="respEmpresaId">
+                    <input type="hidden" id="respId">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4"><input class="form-control" id="respNome" placeholder="Nome"></div>
+                        <div class="col-md-3"><input class="form-control" id="respCPF" placeholder="CPF"></div>
+                        <div class="col-md-3"><input class="form-control" id="respCargo" placeholder="Cargo"></div>
+                        <div class="col-md-2"><button class="btn btn-success w-100" id="btnSalvarResponsavel">Add</button></div>
+                    </div>
+                    <table class="table">
+                        <tbody id="listaResponsaveis"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="modalContatos">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Contatos</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="contEmpresaId">
+        <input type="hidden" id="contId">
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-5">
+            <input class="form-control" id="contEmail" placeholder="Email">
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" id="contTelefone" placeholder="Telefone">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-success w-100" id="btnSalvarContato">Add</button>
+          </div>
+        </div>
+
+        <ul class="list-group" id="listaContatos"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <script src="../../js/xlsx.full.min.js"></script>
+
+<script src="../../js/sweetalert2.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+
+    <script src="empresas.js"></script>
+</body>
+</html>

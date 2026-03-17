@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+    <title>Gerenciar Tags do Processo</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+        
+  <link rel="stylesheet" href="css/sweetalert2.min.css">
+
+    <style>
+        body { font-family: Arial, sans-serif; padding: 15px; background-color: #f4f4f4; margin: 0; }
+        h3 { margin-top: 0; color: #333; }
+        input[type="color"]{height:36px;padding:2px;border:none;background:transparent;margin-top:6px}
+        .tag-list { list-style: none; padding: 0; }
+        .tag-item { 
+        /* Restaura o display flex para manter o nome da tag e os botões de ação em linha */
+        display: flex; 
+        justify-content: space-between; /* Espaçamento entre info e ações */
+        align-items: flex-start; /* Alinha o topo */
+        flex-wrap: wrap; /* CRUCIAL: Permite que o formulário de edição vá para a linha de baixo */
+        background-color: #fff; 
+        border: 1px solid #ddd; 
+        padding: 10px; 
+        margin-bottom: 8px; 
+        border-radius: 6px;
+    }
+        .tag-info { display: flex; align-items: center; }
+        .tag-color { width: 15px; height: 15px; border-radius: 50%; margin-right: 10px; border: 1px solid #aaa; }
+        .tag-name { font-weight: bold; color: #555; }
+        .tag-instance-id { font-size: 10px; color: #aaa; margin-left: 10px; }
+        .tag-actions button { 
+            padding: 5px 10px; 
+            margin-left: 5px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .btn-edit { background-color: #ffc107; color: #333; }
+        .btn-remove { background-color: #dc3545; color: #fff; }
+        .no-tags { color: #666; margin-top: 20px; text-align: center; }
+        .tag-info-wrapper {
+        display: flex; /* Mantém as informações da tag em uma linha */
+        justify-content: space-between; 
+        align-items: center; 
+    }
+        /* Formulário de Edição (Inicialmente invisível) */
+      .edit-form { 
+        background-color: #eee; 
+        padding: 10px; 
+        border-radius: 6px; 
+        margin-top: 10px; 
+        /* Mantemos o display flex (column) para os botões irem para baixo */
+        display: none;
+        flex-direction: column; 
+        width: 100%; 
+        box-sizing: border-box; 
+    }
+    
+    /* NOVO: Contêiner para os inputs de texto e cor */
+    .edit-input-group {
+        display: flex; /* Habilita flexbox para esta linha */
+        gap: 8px; /* Espaço entre os inputs */
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    /* Estilo do Input de Nome da Tag (Texto) */
+    .edit-input-group input[type="text"] {
+        flex-grow: 1; /* Permite que o campo de texto ocupe todo o espaço restante */
+        padding: 8px; 
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        box-sizing: border-box;
+        margin: 0; /* Remove margem desnecessária se copiado de outros lugares */
+    }
+    
+    /* Estilo do Input de Cor da Tag (Cor) */
+    .edit-input-group input[type="color"] {
+        flex-shrink: 0; /* Impede que ele seja reduzido */
+        width: 40px; /* Largura fixa (tamanho ajustável) */
+        height: 34px; /* Altura para alinhar com o input de texto */
+        padding: 0;
+        border: 1px solid #ccc;
+        background: #fff;
+        margin: 0;
+    }
+
+    /* Estilos dos Botões no final do formulário */
+    .edit-form button { 
+        margin-top: 10px; 
+        padding: 10px; 
+        font-weight: bold; 
+    }
+        .edit-form input { margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .edit-form button { margin-top: 10px; padding: 10px; font-weight: bold; }
+        .btn-save { background-color: #0d6efd; color: #fff; }
+        .btn-cancel { background-color: #6c757d; color: #fff; }
+    </style>
+</head>
+<body>
+    <h3 id="processTitle" class="text-dark">Gerenciar Tags - Processo ID: ...</h3>
+    <button id="openPopupBtn" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #198754; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fa fa-plus-circle"></i> Adicionar Nova Tag Rápida
+    </button>
+    <ul id="tagsContainer" class="tag-list text-dark bg-white">
+        <p>Carregando tags...</p>
+    </ul>
+        <!-- Importação do JS do SweetAlert2 LOCAL -->
+        <script src="js/sweetalert2.min.js"></script>
+        <!-- Importação do JS do Bootstrap 5 LOCAL -->
+        <script src="js/bootstrap.min.js"></script>
+    <script src="tagManager.js"></script>
+    
+<script src="theme.js"></script>
+</body>
+</html>

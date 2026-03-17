@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+        
+  <link rel="stylesheet" href="css/sweetalert2.min.css">
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <title>Ordenar Tags</title>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+      background: #f8f9fa;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: grab;
+      gap: 10px;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .note {
+      font-size: 11px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Ordenar Tags</h2>
+
+  <ul id="tagsList"></ul>
+
+  <p class="note">
+    Arraste para definir a ordem das tags no sistema.
+  </p>
+
+  <script src="js/Sortable.min.js"></script>
+  <script src="tags-order.js"></script>
+  
+        <!-- Importação do JS do SweetAlert2 LOCAL -->
+        <script src="js/sweetalert2.min.js"></script>
+        <!-- Importação do JS do Bootstrap 5 LOCAL -->
+        <script src="js/bootstrap.min.js"></script>
+        
+<script src="theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bem-vindo à Extensão Tags</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+        
+  <link rel="stylesheet" href="css/sweetalert2.min.css">
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1976d2; 
+            --secondary-color: #28a745; 
+            --bs-primary: var(--primary-color);
+            --bs-success: var(--secondary-color);
+        }
+        body {
+            background-color: var(--bs-light);
+            line-height: 1.6;
+        }
+        /* Estilo customizado para o container central */
+        .welcome-card {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: var(--bs-primary);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            color: var(--bs-success);
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-block {
+            border-left: 5px solid var(--bs-primary);
+            background-color: #f1f8ff;  Lightest blue */
+        }
+        .feature-block:nth-child(odd) {
+            border-left-color: var(--bs-success);
+            background-color: #fff;
+        }
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        .step-list .icon {
+            color: var(--bs-primary);
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        /* --- ESTILOS DE DEMONSTRAÇÃO --- */
+        .demo-box {
+            overflow: hidden;
+            min-height: 12rem;
+            border: 1px dashed #adb5bd;
+            border-radius: 0.3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6c757d;
+            position: relative;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            overflow: hidden; /* Importante para o iframe */
+        }
+        /* Iframe de Configurações (480x550) */
+        .settings-demo-box {
+            overflow: hidden;
+            width: 480px; 
+            height: 400px; 
+            padding: 5px; 
+            border: 1px solid var(--bs-primary);
+            background: #fff;
+        }
+        #settingsIframe {
+            width: 100%; 
+            height: 95%; 
+            border: none;
+            background-color: #fff; 
+        }
+
+        /* Tags Rápidas */
+        .tags-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+        .quick-tag-btn {
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            color: white;
+            border: 2px solid;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: transform 0.1s;
+        }
+        .quick-tag-btn:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        .toast-success {
+            position: absolute;
+            bottom: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            color: white;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: none; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        /* Popup Manual */
+        .popup-sim-form {
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.5rem; 
+            width: 100%;
+        }
+        .popup-sim-row button {
+             /* Estilo do botão de salvar, usando classes do Bootstrap */
+             background: var(--bs-primary);
+        }
+    </style>
+</head>
+<body class='text-dark bg-white'>
+    <div class="container">
+        <div class="welcome-card bg-white">
+            <h1 class="text-center d-flex justify-content-center align-items-center gap-2">
+                <i class="fa fa-tags"></i>
+                Bem-vindo(a) à Extensão Tags!
+            </h1>
+
+            <p class="lead text-center mb-5">Parabéns! Sua extensão "Tags - Menu Flutuante" foi instalada. Siga o tutorial abaixo para começar a usar de forma rápida e eficiente.</p>
+
+            <div class="feature-block p-3 mb-4">
+                <h2><i class="fa fa-cogs"></i> 1. Configurar Tags Rápidas e Opções</h2>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-7">
+                        <p>O primeiro passo é configurar suas tags favoritas e personalizar as opções da extensão. Você pode acessar esta tela a qualquer momento clicando no <img src="icon.png" class="" style="width: 20px; height: 20px; vertical-align: bottom;">.</p>
+                        <h3>Passo a Passo:</h3>
+                        <ul class="step-list text-left">
+                            <li>
+                                <p><span class="icon"><i class="fa fa-mouse-pointer"></i></span> <strong>Acesse:</strong> &nbsp;Clique nas sua extensões e depois no Ícone da Extensão: <img src="icon.png" class="" style="width: 20px; height: 20px; vertical-align: middle; "></p></li>
+                            <li>
+                                <span class="icon"><i class="fa fa-list-check"></i></span> <strong>Ajuste:</strong> &nbsp; Defina o `Tipo de Menu` e as opções de `Ordenação`.
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fa fa-tags"></i></span><strong>Crie:</strong> &nbsp; Adicione suas Tags Rápidas personalizadas (Nome e Cor).</li>
+
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-5 d-flex justify-content-center justify-content-md-end">
+                        <div class="demo-box settings-demo-box shadow">
+                            <p class="m-0 font-weight-bold text-primary">Simulação Real da Tela de Configurações:</p>
+                            <iframe id="settingsIframe" src="settings.html" title="Configurações da Extensão" frameborder="0"  scrolling="no"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-block p-3 mb-4">
+                <h2><i class="fa fa-hand-pointer"></i> 2. Marcação Rápida (Botão Direito)</h2>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-8">
+                        <p>A forma mais rápida de usar a extensão. <strong>Basta ir para a página inicial do processo digital e clicar com o botão direito</strong> em um processo. As Tags Rápidas que você configurou (na Seção 1) aparecerão!</p>
+                        <h3>Tutorial e Benefícios:</h3>
+                        <ul class="step-list">
+                            <li><span class="icon"><i class="fa fa-right-to-bracket"></i></span> <strong>Ação Principal:</strong> Clique com o Botão Direito no item da lista de processos.</li>
+                            <li><span class="icon"><i class="fa fa-tags"></i></span> Escolha uma Tag Rápida no menu.</li>
+                            <li><span class="icon"><i class="fa fa-bolt"></i></span> <strong>Velocidade:</strong> Aplicação instantânea sem abrir janelas.</li>
+                            <li><span class="icon"><i class="fa fa-check-circle"></i></span> <strong>Teste:</strong> Clique em qualquer tag ao lado para simular a aplicação instantânea.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-4 d-flex justify-content-center justify-content-md-end">
+                        <div class="demo-box shadow" id="quickTagsDemo" style="width: 100%; max-width: 300px; height: 180px;">
+                            <p class="mb-2">Clique em uma Tag Rápida:</p>
+                            <div id="quickTagsGallery" class="tags-gallery">
+                                <p class="text-muted" style="font-size: 0.7rem;">Carregando suas tags...</p>
+                            </div>
+                            <div id="simulationToast" class="toast-success"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-block p-3 mb-4">
+                <h2><i class="fa fa-window-restore"></i> 3. Popup: Criação Manual de Tags</h2>
+                 <div class="row g-3 align-items-start">
+                    <div class="col-md-8">
+                        <p>Use o Popup (o ícone da extensão) para criar uma tag com nome e cor personalizados, uma a uma. Isso é útil para tags únicas que não precisam ser salvas como Tags Rápidas.</p>
+                        <h3>Como Funciona a Criação Manual:</h3>
+                        <ul class="step-list">
+                            <li><span class="icon"><i class="fa fa-pencil-alt"></i></span> Permite customizar Nome e Cor antes de salvar.</li>
+                            <li><span class="icon"><i class="fa fa-id-badge"></i></span> O ID do processo é preenchido automaticamente.</li>
+                            <li><span class="icon"><i class="fa fa-save"></i></span> A tag é salva no histórico do processo.</li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4 d-flex justify-content-center justify-content-md-end">
+                        <div class="demo-box shadow" id="popupDemo" style="width: 100%; max-width: 300px; height: 250px;">
+                            <p class="mb-2 fw-bold text-primary">Simulação do Popup</p>
+                            
+                            <div class="popup-sim-form">
+                                <input type="text" id="simProcessId" class="form-control form-control-sm" placeholder="ID do Processo (Ex: 12345)" value="75350" readonly>
+                                <input type="text" id="simTagName" class="form-control form-control-sm" placeholder="Nome da Tag (Ex: Novo Cliente)">
+                                
+                                <div class="popup-sim-row d-flex gap-2 align-items-center">
+                                    <input type="color" id="simTagColor" value="#9C27B0" class="form-control form-control-color" style="flex-shrink: 0; width: 40px; height: 36px; padding: 2px;">
+                                    <button id="simSaveBtn" class="btn btn-sm btn-primary flex-grow-1">Salvar Tag</button>
+                                </div>
+                            </div>
+
+                            <div id="popupSimulationToast" class="toast-success"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-muted mt-5">Sua extensão está pronta para uso!</p>
+
+        </div>
+    </div>
+
+        <!-- Importação do JS do SweetAlert2 LOCAL -->
+        <script src="js/sweetalert2.min.js"></script>
+        <!-- Importação do JS do Bootstrap 5 LOCAL -->
+        <script src="js/bootstrap.min.js"></script>
+    <script src="bem-vindo.js"></script>
+    
+<script src="theme.js"></script>
+</body>
+</html>

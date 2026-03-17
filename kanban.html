@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KANBAN - PROCESSO DIGITAL</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+        
+  <link rel="stylesheet" href="css/sweetalert2.min.css">
+  <style>
+
+    body { overflow-x: auto; white-space: nowrap; height: 100vh; background: #3a546e; padding: 20px; }
+    .board { 
+    display: inline-block; 
+    vertical-align: top; 
+    width: 240px;          /* Era 300px, reduzi para 240px */
+    margin-right: 15px;    /* Espaçamento lateral menor */
+    background: #e7e7e7; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+}
+
+/* Diminuindo a fonte do título da coluna */
+.board-header { 
+    font-weight: 600; 
+    font-size: 0.95rem;    /* Era 1.1rem, reduzi para 0.95rem */
+    color: #fff; 
+    padding: 8px 10px;     /* Padding menor para ficar mais compacto */
+    border-top-left-radius: 10px; 
+    border-top-right-radius: 10px; 
+}
+   .task-list { min-height: 100px; padding: 10px; }
+    .task {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 4px 0;
+    padding: 6px;          /* Padding interno reduzido */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    font-size: 0.85rem;    /* Diminuindo a fonte do texto da task */
+}
+    .task:hover { background: #dee2e6; }
+    .due-date { font-size: 0.8rem; color: #495057; }
+    .task {
+      display: flex;
+      align-items: center;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin: 4px 0;
+      padding: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .task:hover {
+      background: #e9ecef;
+    }
+
+    .task-color-bar {
+      width: 6px;
+      height: 100%;
+      border-radius: 4px 0 0 4px;
+      margin-right: 8px;
+    }
+
+    .task-content {
+    flex: 1;
+    line-height: 1.2;      /* Diminui o espaçamento entre linhas */
+    white-space: normal;   /* Garante que o texto quebre linha no card menor */
+}
+.due-date {
+    color: #6c757d;
+    font-size: 0.75rem;    /* Era 0.8rem */
+}
+.task-color-bar {
+    width: 4px;            /* Era 6px */
+    height: 100%;
+    border-radius: 4px 0 0 4px;
+    margin-right: 6px;
+}
+
+    .kanban-guide {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: auto;
+      background: #1c1f22;
+      padding: 6px 0;
+      border-radius: 0 8px 8px 0;
+      overflow: hidden;
+      transition: width 0.25s ease;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    .kanban-guide:hover {
+      width: 150px;
+    }
+
+    .kanban-guide-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      color: white;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .kanban-guide:hover .kanban-guide-item {
+      opacity: 1;
+    }
+
+    .kanban-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    #kanbanSearchBar {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      padding: 10px;
+      z-index: 1030;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0px 4px 10px #00000088;
+    }
+
+    #kanbanSearchBar input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #fff;
+      color: #000;
+    }
+
+    #kanbanTopSpacer {
+      height: 20px;   /* altura da barra flutuante */
+
+    }
+
+    #textsearch{
+      bottom: 20px;
+      color:#fff;
+      position: fixed;
+      left: 20px;
+      opacity: 60%;
+    }
+/* Reduzindo a fonte e compactando o Modal de Detalhes */
+#taskModal .modal-content {
+    font-size: 0.85rem; /* Mesma escala que usamos no board */
+}
+
+#taskModal .modal-title {
+    font-size: 1rem;
+}
+
+/* Diminuindo o tamanho dos inputs e labels para ocupar menos espaço */
+#taskModal .form-control, 
+#taskModal .form-label,
+#taskModal .btn {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+#taskModal .modal-header, 
+#taskModal .modal-footer {
+    padding: 8px 15px;
+}
+
+/* Ajuste específico para o histórico e informações de tempo */
+#historyList, #boardTimeInfo {
+    font-size: 0.75rem;
+}
+
+/* Reduzindo as margens entre as linhas do modal */
+#taskModal .mb-3, #taskModal .mt-2 {
+    margin-bottom: 0.5rem !important;
+    margin-top: 0.3rem !important;
+}
+
+#taskModal hr {
+    margin: 0.5rem 0;
+}
+
+
+  </style>
+</head>
+<body>
+  <div id="kanbanTopSpacer"></div>
+  <div class="kanban-search-bar d-none " id="kanbanSearchBar">
+    <input id="kanbanFilterInput" type="text" placeholder="Filtrar processos..." />
+
+  </div>
+  <div id="loadForecast"  class='d-none'
+  style=" padding:10px; margin-bottom:10px; border-radius:8px;">
+  Carregando previsão...
+</div>
+
+
+<div class="modal fade" id="globalSearchModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="">
+      <div class="modal-header">
+        <h5 class="modal-title">Busca Global</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input id="globalSearchInput" type="text" class="form-control text-dark" placeholder="Digite qualquer coisa..." />
+        <div id="globalSearchResults" style="margin-top:15px; max-height: 400px; overflow-y:auto;"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div id="boardsContainer" style="transform: scale(1);transform-origin: top left;"></div>
+<div id="kanbanGuide" class="kanban-guide"></div>
+
+<div id="textsearch">Ctrl + M - Pesquisar Processos</div>
+
+
+<!-- Modal -->
+<div class="modal fade " id="taskModal" tabindex="-1" aria-hidden="true" style="">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button id="SearchProcessBtn" class="btn bg-primary-subtle"><i class="fa-solid fa-magnifying-glass text-success-emphasis"></i></button>
+        <h5 class="modal-title ms-2">Detalhes do Processo <strong class="opacity-25">ID:<span id="modalProcessId"></span></strong> </h5> 
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-dark">
+
+        <div class="row align-items-center">
+          <div class='col-6 mt-2 '>
+           <p><strong>Número:</strong> <span id="modalProcessNumber"></span></p>
+         </div>
+         <div class="col-5">
+          <div class="row">
+            <div class="col-3 mt-2 mr-3">
+              <label class="form-label"> <strong>Data de Prazo</strong></label>
+            </div> 
+            <div class="col-8 ml-3 offset-md-1">
+              <input type="date" id="modalDataPrazo" class="form-control text-dark">
+            </div>
+
+            
+          </div>
+        </div>
+
+      </div>
+
+      
+
+
+
+      <div class="mb-3">
+        <label class="form-label">Descrição / Comentário</label>
+        <textarea id="modalDescription" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="row">
+        <div class='col opacity-100'>
+
+          <div id="tagsListModal" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;"></div>
+
+        </div>
+      </div>
+
+      <hr>
+      <h6>Histórico do Processo</h6>
+      <div id="historyList" class="text-muted small" style="max-height: 200px; overflow-y: auto;"></div>
+      <hr>
+      <h6>⏱ Tempo no Board</h6>
+      <div id="boardTimeInfo" style="font-size: 0.85rem; opacity: .9;">
+        Carregando...
+      </div>
+    </div>
+
+    <!-- Rodapé com 3 botões -->
+    <div class="modal-footer d-flex justify-content-between align-items-center">
+      <button id="removeTaskBtn" class="btn btn-danger">Remover</button>
+      <button id="openProcessBtn" class="btn btn-secondary">Abrir Processo</button>
+      
+      <button id="saveTaskBtn" class="btn btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="modal fade" id="createProcessModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Novo Processo</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <label>Número do Processo</label>
+        <input id="newProcessNumber" type="text" class="form-control" placeholder="Ex.: 12345/2024">
+      </div>
+
+      <div class="modal-footer">
+        <button id="saveNewProcess" class="btn btn-primary">Adicionar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+
+<script src="js/Sortable.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="kanban.js"></script>
+<script src="js/sweetalert2.min.js"></script>
+<script src="listTags.js"></script>
+
+</body>
+</html>

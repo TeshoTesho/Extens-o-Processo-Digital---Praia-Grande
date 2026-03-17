@@ -1,0 +1,113 @@
+{
+  "manifest_version": 3,
+  "name": "Gerenciador Processo Digital",
+  "version": "2.4.0",
+  "description": "Adicionar/Remover tags coloridas em processos e gerenciar via Kanban.",
+  "omnibox": { "keyword": "assinador" },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "alarms",
+    "clipboardWrite"
+  ],
+  
+  "host_permissions": [
+    "https://www.intra.pg/*",
+    "https://loginunicointerno.praiagrande.sp.gov.br/*",
+    "https://processodigital.praiagrande.sp.gov.br/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "action": {
+    "default_popup": "settings.html",
+    "default_title": "Gerenciador de Processos",
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://processodigital.praiagrande.sp.gov.br/CaixaEntrada/Recebidos*"],
+      "js": ["content_auth.js"]
+    },
+    {
+      "matches": ["https://loginunicointerno.praiagrande.sp.gov.br/DadosPessoais/EditarDados*"],
+      "js": ["content_dados.js"]
+    },
+    {
+      "matches": ["https://assinadordigitalexterno.praiagrande.sp.gov.br/*"],
+      "js": ["js/sweetalert2.min.js", "content_assinador.js","js/inject_fw.js"],
+      "css": ["css/sweetalert2.min.css","css/all.min.css"],
+      "run_at": "document_end",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://processodigital.praiagrande.sp.gov.br/*"],
+      "js": ["js/sweetalert2.min.js", "content.js","content_auth.js"],
+      "css": ["css/sweetalert2.min.css","css/all.min.css"],
+      "run_at": "document_end",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://processodigital.praiagrande.sp.gov.br/*","https://assinadordigitalexterno.praiagrande.sp.gov.br/*","https://sso.praiagrande.sp.gov.br/*"],
+      "js": ["theme.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://www.intra.pg/SEAD/Lists/AssDigital/Item/newifs.aspx*"],
+      "js": ["content_sead.js","js/inject_fw.js"],
+      "css": ["css/sweetalert2.min.css","css/all.min.css"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.intra.pg/SEAD/SitePages/assd2.aspx*"],
+      "js": ["js/sweetalert2.min.js", "content_intra.js","js/inject_fw.js"],
+      "css": ["css/sweetalert2.min.css","css/all.min.css"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://www.intra.pg/SEAD/SitePages/assd2.aspx*"
+      ],
+      "js": [
+        "content_script_assinador.js","js/inject_fw.js"
+      ]
+    }
+  ],
+
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": true
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "kanban.html",
+        "lista_assinador.html",
+        "tags.html",
+        "settings.html",
+        "js/*",
+        "css/*",
+        "imgs/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
