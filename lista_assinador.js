@@ -467,33 +467,47 @@ async function startRealSignaturesUpdateTabela(lista) {
 // =======================================================================
 // 🔥 GARANTIDO: Aplica badge Amarelo/Warning para itens não mapeados
 // =======================================================================
-function generateAssinaturaTooltipContent(status_assinaturas) {
+function generateAssinaturaTooltipContent(status_assinaturas, agrupadas = {}) {
+    
     let tooltipHtml = `<span class='d-block text-center mb-1'>SECRETARIAS</span>`;
     
-    // Adicionamos 'd-inline-block' ao badge para que ele se comporte como um bloco
-    // e possa quebrar linha dentro do espaço limitado do Tooltip.
+    const normalize = str =>
+    (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .trim();
+
     const badgesHtml = status_assinaturas.map(status => {
-        let label = status.abreviacao || status.secretaria; 
-        let type = 'secondary'; 
+    let label = status.abreviacao || status.secretaria;
+    let type = 'secondary';
 
-        // Checa as flags de Warning
-        if (status.responsavel === "Não mapeado (Pendente)") {
-            type = 'warning'; 
-        } else if (status.responsavel === "Signatário Extra") {
-            type = 'warning'; 
-            // Altera o label para deixar claro que é uma assinatura extra
-            // Use uma abreviação do nome para caber melhor no Tooltip (opcional)
-            // Se o nome for muito grande, a quebra de linha ainda é a melhor solução.
-            label = `${status.abreviacao}`; 
-        } else if (status.assinado) {
-            type = 'success';
-        }
-        
-        // Adicionei 'd-inline-block' aqui, junto com 'me-1 mb-1'
-        return `<span class='badge text-bg-${type} d-inline-block me-1 mb-1'>${label}</span>`;
-    }).join("");
+    const nomeComparacao = status.responsavel;
 
-    return tooltipHtml + badgesHtml;
+    const key = Object.keys(agrupadas).find(k =>
+        k === normalize(nomeComparacao)
+    );
+
+    if (key && agrupadas[key].count > 1) {
+        label = `${agrupadas[key].count}x ${label}`;
+    }
+
+    if (status.responsavel === "Não mapeado (Pendente)") {
+        type = 'warning';
+    } else if (status.responsavel === "Signatário Extra") {
+        type = 'warning';
+    } else if (status.assinado) {
+        type = 'success';
+    }
+
+    return `<span class='badge text-bg-${type} d-inline-block me-1 mb-1'>${label}</span>`;
+}).join("");
+
+    // 🔥 AGORA SIM junta tudo
+    tooltipHtml += badgesHtml;
+
+    // 🔥 E RETORNA
+    return tooltipHtml;
 }
 
 
@@ -501,7 +515,12 @@ async function buscarAssinaturasTabela(id, elementoDestino, doc) {
     if (!id || !elementoDestino) return;
     const listatotal = doc.Locais.results;
     const assinaturas = await buscarAssinaturas(id);
-    const concluidos = assinaturas.length;
+
+    const agrupadas = agruparAssinaturas(assinaturas);
+
+// Conta apenas únicos
+    const concluidos = Object.keys(agrupadas).length;
+
     const total = Number(doc.Contagem) || 0;
 
     // 1. Obtém o status de assinatura para todas as secretarias necessárias
@@ -522,7 +541,7 @@ async function buscarAssinaturasTabela(id, elementoDestino, doc) {
     // Conta o total de secretarias mapeadas/requeridas
     const display_total = required_statuses.length;
     // 2. Gera o HTML do conteúdo do Tooltip (lista de badges)
-    const tooltipContent = generateAssinaturaTooltipContent(status_assinaturas);
+    const tooltipContent = generateAssinaturaTooltipContent(status_assinaturas, agrupadas);
 
     // 4. Monta o HTML final para a célula da tabela
     // Substitui aspas duplas internas por &quot; para evitar quebras no atributo data-bs-title.
@@ -555,6 +574,32 @@ async function buscarAssinaturasTabela(id, elementoDestino, doc) {
     }
 }
 
+function agruparAssinaturas(assinaturas) {
+    const normalize = str =>
+    (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .trim();
+
+    const contagem = {};
+
+    assinaturas.forEach(a => {
+        const nome = normalize(a.responsavel);
+
+        if (!contagem[nome]) {
+            contagem[nome] = {
+                nomeOriginal: a.responsavel,
+                count: 0
+            };
+        }
+
+        contagem[nome].count++;
+    });
+
+    return contagem;
+}
+
 
 // Busca signers para um dado id. Trata 404 como "sem assinantes".
 async function buscarAssinaturas(idOrLink) {
@@ -568,32 +613,32 @@ async function buscarAssinaturas(idOrLink) {
         return [];
     }
 
-  const url = `https://assinadordigitalexterno.praiagrande.sp.gov.br/sign/pades/signers/${id}`;
+    const url = `https://assinadordigitalexterno.praiagrande.sp.gov.br/sign/pades/signers/${id}`;
 
-try {
-    const res = await fetch(url, {
-        method: "GET",
-        credentials: "include"
-    });
+    try {
+        const res = await fetch(url, {
+            method: "GET",
+            credentials: "include"
+        });
 
     // Se for 404, retornamos vazio imediatamente sem tentar ler o JSON
-    if (res.status === 404) {
-        return [];
-    }
+        if (res.status === 404) {
+            return [];
+        }
 
     // Se houver outro erro (500, 403, etc)
-    if (!res.ok) {
+        if (!res.ok) {
+            return [];
+        }
+
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+
+    } catch (e) {
+    // Erros de rede (DNS, offline, timeout) caem aqui
+        console.error("Erro de conexão ao buscar assinaturas:", e);
         return [];
     }
-
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-
-} catch (e) {
-    // Erros de rede (DNS, offline, timeout) caem aqui
-    console.error("Erro de conexão ao buscar assinaturas:", e);
-    return [];
-}
 }
 
 // ------------------------------
@@ -757,53 +802,53 @@ async function updateCardDetails(doc, cardElement) {
     const EditarBtn = `<a target="_blank" href="http://www.intra.pg/SEAD/_layouts/15/listform.aspx?PageType=6&ListId=%7BDA67FC64%2D1B63%2D4608%2DB859%2D8DE4BC9B1FD8%7D&ID=${doc.ID}" class="btn btn-outline-white btn-sm"><i class="fa fa-cog" aria-hidden="true"></i></a>`;
     const btnGrupo = `<button class="btn btn-sm  btn-add-grupo" data-id="${doc.ID}">
                     <i class="fa fa-folder-plus"></i>
-                  </button>`;
+</button>`;
     // Seleciona via data-attributes (mais confiável)
-    const cardHeader = cardElement.querySelector('[data-card-header]');
-    const cardFooterStrong = cardElement.querySelector('[data-card-footer-count]');
-    const titleElement = cardElement.querySelector('[data-card-title]');
+const cardHeader = cardElement.querySelector('[data-card-header]');
+const cardFooterStrong = cardElement.querySelector('[data-card-footer-count]');
+const titleElement = cardElement.querySelector('[data-card-title]');
 
     // Lista de classes de cor/borda que podemos querer remover antes de aplicar novas
-    const colorsAndBorders = [
-        "bg-white", "bg-secondary",
-        "text-dark", "text-white", "text-success", "text-warning", "text-danger", "text-muted",
-        "border", "border-success", "border-danger"
-    ];
+const colorsAndBorders = [
+    "bg-white", "bg-secondary",
+    "text-dark", "text-white", "text-success", "text-warning", "text-danger", "text-muted",
+    "border", "border-success", "border-danger"
+];
 
     // Atualiza header: remove classes conflitantes e aplica as novas
-    if (cardHeader) {
+if (cardHeader) {
         // garante que as classes base de layout existam
-        cardHeader.classList.add("card-header", "d-flex", "justify-content-between", "align-items-center", "p-2");
+    cardHeader.classList.add("card-header", "d-flex", "justify-content-between", "align-items-center", "p-2");
 
         // remove classes de cores/bordas antigas
-        colorsAndBorders.forEach(c => cardHeader.classList.remove(c));
+    colorsAndBorders.forEach(c => cardHeader.classList.remove(c));
 
         // adiciona as classes de estado calculadas
-        additionalHeaderClasses.forEach(c => cardHeader.classList.add(c));
+    additionalHeaderClasses.forEach(c => cardHeader.classList.add(c));
 
         // atualiza o conteúdo interno (preserva estrutura simples)
-        cardHeader.innerHTML = `
+    cardHeader.innerHTML = `
         <span>${EditarBtn}</span>
         <span class="flex-grow-1">${textoHeader}</span>
 
-          
+
         <span></span>
-        `;
-    }
+    `;
+}
 
     // Atualiza footer (contador)
-    if (cardFooterStrong) {
+if (cardFooterStrong) {
         // remove classes antigas e aplica a nova
-        colorsAndBorders.forEach(c => cardFooterStrong.classList.remove(c));
-        cardFooterStrong.classList.add(newTextColorClass);
-        cardFooterStrong.textContent = `${assinadas} / ${total}`;
-    }
+    colorsAndBorders.forEach(c => cardFooterStrong.classList.remove(c));
+    cardFooterStrong.classList.add(newTextColorClass);
+    cardFooterStrong.textContent = `${assinadas} / ${total}`;
+}
 
     // Atualiza o título (classe de cor)
-    if (titleElement) {
-        colorsAndBorders.forEach(c => titleElement.classList.remove(c));
-        titleElement.classList.add('text-dark');
-    }
+if (titleElement) {
+    colorsAndBorders.forEach(c => titleElement.classList.remove(c));
+    titleElement.classList.add('text-dark');
+}
 }
 
 // =======================================================================
@@ -921,17 +966,17 @@ async function renderLista(lista, isInitialLoad = true) {
                 <i class="fa fa-cog"></i>
             </a>
         `;
-         const grupoAtivo = document.getElementById("selectGrupo")?.value || "todos";
-const isRemover = grupoAtivo !== "todos";
+        const grupoAtivo = document.getElementById("selectGrupo")?.value || "todos";
+        const isRemover = grupoAtivo !== "todos";
 
 // No HTML do botão:
-const botaoGrupo = `
+        const botaoGrupo = `
     <button class="btn ${isRemover ? 'btn-outline-danger' : ''} btn-sm" 
             onclick="${isRemover ? `removerProcessoDoGrupo('${doc.ID}')` : `adicionarProcessoAoGrupo('${doc.ID}')`}"
             title="${isRemover ? 'Remover deste grupo' : 'Adicionar a um grupo'}">
         <i class="fa ${isRemover ? 'fa-trash' : 'fa-folder-plus'}"></i>
     </button>
-`;
+        `;
 
         const cardId = `doc-card-${id}`;
 
@@ -1228,15 +1273,15 @@ function renderTabela(lista) {
 
         const link = sanitizeLinkField(doc.Link_x0020_Documento);
         const idAssinador = extrairIdAssinador(link);
-const grupoSelecionado = document.getElementById("selectGrupo")?.value || "todos";
-const modoLixeira = grupoSelecionado !== "todos";
+        const grupoSelecionado = document.getElementById("selectGrupo")?.value || "todos";
+        const modoLixeira = grupoSelecionado !== "todos";
 
 // Define ícone e cor
-const iconeAcao = modoLixeira ? "fa-trash" : "fa-folder-plus";
-const classeCor = modoLixeira ? "btn-outline-danger" : "";
-const classeIdentificadora = modoLixeira ? "btn-remover-do-grupo" : "btn-adicionar-ao-grupo";
+        const iconeAcao = modoLixeira ? "fa-trash" : "fa-folder-plus";
+        const classeCor = modoLixeira ? "btn-outline-danger" : "";
+        const classeIdentificadora = modoLixeira ? "btn-remover-do-grupo" : "btn-adicionar-ao-grupo";
 
-         html += `
+        html += `
             <tr data-id="${idAssinador || ''}" >
                 <td class='d-none'>${doc.ID}</td>
                 <td class='text-center'>
@@ -1247,7 +1292,7 @@ const classeIdentificadora = modoLixeira ? "btn-remover-do-grupo" : "btn-adicion
 
                     </a>
 
-                  
+
 
                 </td>
 
@@ -1257,7 +1302,7 @@ const classeIdentificadora = modoLixeira ? "btn-remover-do-grupo" : "btn-adicion
                         ${doc.Title}
                     </a>
 
-               
+
                 </td>
 
                 <td class='text-center text-dark'>${doc.Categoria || ""}</td>
@@ -1334,7 +1379,7 @@ document.addEventListener('click', function (e) {
     }
 
     // Lógica de Imprimir (Nova Abordagem)
-   if (btnPrint) {
+    if (btnPrint) {
         const linkPDF = btnPrint.getAttribute('data-link');
 
         // 1. Confirmação antes de qualquer ação
@@ -1641,7 +1686,7 @@ async function filtrarPorGrupo() {
             <div class="col-12 text-center mt-5 text-muted">
                 <i class="fa fa-folder-open fa-3x"></i>
                 <p class="mt-2">Este grupo está vazio.</p>
-            </div>`;
+        </div>`;
         atualizarContagem(0);
         return;
     }
