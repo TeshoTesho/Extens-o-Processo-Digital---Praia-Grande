@@ -291,71 +291,66 @@ function updatePredefinedTagsDisplay(tags) {
     tags = sortPredefinedTags(tags);
     tags.forEach(tag => {
 
-        // 🔁 Compatibilidade com tags antigas
         if (typeof tag.showOnBoard !== 'boolean') tag.showOnBoard = true;
         if (typeof tag.showInAdvancedMenu !== 'boolean') tag.showInAdvancedMenu = true;
 
         const li = document.createElement('li');
+        // AJUSTE: Padding lateral de 12px para não encostar na borda
         li.style.cssText = `
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-        gap: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px; 
+            border-bottom: 1px solid #eee;
+            gap: 10px;
         `;
 
         // === Nome + cor ===
         const nameColorDiv = document.createElement('div');
-        nameColorDiv.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-grow: 1;';
+        // AJUSTE: overflow hidden para nomes muito longos
+        nameColorDiv.style.cssText = 'display: flex; align-items: center; gap: 10px; flex-grow: 1; overflow: hidden;';
 
         const colorSpan = document.createElement('span');
+        // AJUSTE: flex-shrink: 0 impede que a bolinha seja esmagada
         colorSpan.style.cssText = `
-        background-color: ${escapeHtml(tag.color)};
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        border: 1px solid #ccc;
+            background-color: ${escapeHtml(tag.color)};
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            flex-shrink: 0; 
         `;
 
         const nameSpan = document.createElement('span');
         nameSpan.textContent = escapeHtml(tag.name);
         nameSpan.style.fontWeight = 'bold';
+        nameSpan.style.fontSize = '13px';
+        nameSpan.style.whiteSpace = 'nowrap';
+        nameSpan.style.overflow = 'hidden';
+        nameSpan.style.textOverflow = 'ellipsis'; // Adiciona "..." se o nome for gigante
 
         nameColorDiv.appendChild(colorSpan);
         nameColorDiv.appendChild(nameSpan);
 
         // === Checkboxes ===
         const optionsDiv = document.createElement('div');
-        optionsDiv.style.cssText = 'display: flex; gap: 12px; align-items: center;';
+        optionsDiv.style.cssText = 'display: flex; gap: 12px; align-items: center; flex-shrink: 0;';
 
-        // Mostrar no Board
         const boardLabel = document.createElement('label');
-        boardLabel.style.cssText = 'display:flex; align-items:center; gap:4px; font-size:12px;';
-        boardLabel.title = 'Mostrar esta tag como coluna no Kanban';
-
+        boardLabel.style.cssText = 'display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;';
         const boardCheckbox = document.createElement('input');
         boardCheckbox.type = 'checkbox';
         boardCheckbox.checked = tag.showOnBoard;
-        boardCheckbox.addEventListener('change', e => {
-            togglePredefinedTagConfig(tag.name, 'showOnBoard', e.target.checked);
-        });
-
+        boardCheckbox.addEventListener('change', e => togglePredefinedTagConfig(tag.name, 'showOnBoard', e.target.checked));
         boardLabel.appendChild(boardCheckbox);
         boardLabel.appendChild(document.createTextNode('Board'));
 
-        // Mostrar no Menu Avançado
         const menuLabel = document.createElement('label');
-        menuLabel.style.cssText = 'display:flex; align-items:center; gap:4px; font-size:12px;';
-        menuLabel.title = 'Mostrar esta tag no menu avançado';
-
+        menuLabel.style.cssText = 'display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;';
         const menuCheckbox = document.createElement('input');
         menuCheckbox.type = 'checkbox';
         menuCheckbox.checked = tag.showInAdvancedMenu;
-        menuCheckbox.addEventListener('change', e => {
-            togglePredefinedTagConfig(tag.name, 'showInAdvancedMenu', e.target.checked);
-        });
-
+        menuCheckbox.addEventListener('change', e => togglePredefinedTagConfig(tag.name, 'showInAdvancedMenu', e.target.checked));
         menuLabel.appendChild(menuCheckbox);
         menuLabel.appendChild(document.createTextNode('Menu'));
 
@@ -365,27 +360,24 @@ function updatePredefinedTagsDisplay(tags) {
         // === Botão remover ===
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML = '<i class="fa fa-trash"></i>';
-        removeBtn.title = 'Remover Tag Rápida';
         removeBtn.classList.add('bg-danger');
         removeBtn.style.cssText = `
-        padding: 5px 8px;
-        border-radius: 4px;
-        border: none;
-        color: white;
-        cursor: pointer;
-        font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            flex-shrink: 0;
         `;
         removeBtn.addEventListener('click', () => removeTag(tag.name));
 
-        // === Montagem ===
         li.appendChild(nameColorDiv);
         li.appendChild(optionsDiv);
         li.appendChild(removeBtn);
-
         list.appendChild(li);
     });
 
-    // 💾 garante que flags novas fiquem persistidas
     chrome.storage.local.set({ predefinedTags: tags });
 }
 
