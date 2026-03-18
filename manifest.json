@@ -103,6 +103,7 @@
         "lista_assinador.html",
         "tags.html",
         "settings.html",
+        "secretarias.js",
         "js/*",
         "css/*",
         "imgs/*"
