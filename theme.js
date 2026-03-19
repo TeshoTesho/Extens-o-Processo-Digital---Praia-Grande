@@ -162,6 +162,9 @@ div.form-upload, form.form-upload {
 [style*="color:#444A4F"]{
             color:#fff !important;
 }
+            select option {
+    background-color: #121212 ; /* Fundo das opções */
+}
 
             ` : ''}
 
@@ -277,9 +280,7 @@ div.form-upload, form.form-upload {
                 background-color: #121212;
             }
 
-select option {
-    background-color: #121212 ; /* Fundo das opções */
-}
+
         `;
 
    // Remove estilos anteriores para evitar acumulação
