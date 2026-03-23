@@ -85,7 +85,7 @@
             liUpload.className = "nav-item";
 
             liUpload.innerHTML = `
-        <button id="btnUploadLote" class="ml-2 btn btn-warning fw-bold">
+        <button id="btnUploadLote" class="ml-2 btn btn btn-outline-light fw-bold">
             Upload em Lote
         </button>
             `;
