@@ -12,6 +12,42 @@
   <link rel="stylesheet" href="css/sweetalert2.min.css">
   <style>
 
+    @property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-angle-rotate {
+  from { --border-angle: 0deg; }
+  to { --border-angle: 360deg; }
+}
+
+/* A classe que será aplicada ao card localizado */
+.task-highlight-search {
+  --border-angle: 0deg;
+  position: relative;
+  z-index: 10; /* Garante que fique sobre os outros */
+  border: 4px solid transparent !important;
+  border-radius: 8px; /* Ajuste conforme o raio do seu card */
+  
+  /* O truque do gradiente: padding-box mantém o fundo do card, border-box desenha a borda */
+  background: 
+    linear-gradient(var(--card-bg-color, #fff), var(--card-bg-color, #fff)) padding-box,
+    conic-gradient(
+        from var(--border-angle),
+        #00fff2, 
+        #7f00ff, 
+        #ff0055, 
+        #00fff2
+    ) border-box !important;
+    
+  animation: border-angle-rotate 2s infinite linear;
+  box-shadow: 0 0 15px rgba(127, 0, 255, 0.4);
+  transform: scale(1.03);
+  transition: transform 0.3s ease;
+}
+
     body { overflow-x: auto; white-space: nowrap; height: 100vh; background: #3a546e; padding: 20px; }
     .board { 
     display: inline-block; 
