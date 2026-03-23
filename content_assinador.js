@@ -1,12 +1,14 @@
 // content_assinador.js
 (function () {
-let uploadQueueMemoria = [];
-let loteEmExecucao = false;
+    let uploadQueueMemoria = [];
+    let loteEmExecucao = false;
     function isPastaUrl() {
         const url = window.location.href;
         const pastaBaseUrl = 'https://assinadordigitalexterno.praiagrande.sp.gov.br/';
         return url.startsWith(pastaBaseUrl);
     }
+
+
 
     const SIGNED_DOCUMENTS_KEY = "signedDocuments";
 
@@ -27,6 +29,18 @@ let loteEmExecucao = false;
         Toast.fire({ icon, title });
     }
 
+    chrome.runtime.sendMessage({ action: "getBatchRunning" }, (res) => {
+        if (res && res.running) {
+            console.log("🔒 Lote em andamento - restaurando bloqueio");
+
+        // pequeno delay para garantir que o DOM carregou
+            setTimeout(() => {
+                mostrarBloqueioLote("Upload em lote em andamento...");
+            }, 500);
+        }
+    });
+
+
     // ==========================================================
     // 1) PEGAR A URL REAL DO lista.html VIA BACKGROUND
     // ==========================================================
@@ -35,10 +49,10 @@ let loteEmExecucao = false;
 
 
 
-            const ul = localizarMenu();
-            if (!ul) return false;
+        const ul = localizarMenu();
+        if (!ul) return false;
 
-            if (document.getElementById("btnMinhaLista")) return true;
+        if (document.getElementById("btnMinhaLista")) return true;
 
         if (!response || !response.url) {
             console.error("❌ Não consegui obter a URL da lista.html via background.js");
@@ -59,48 +73,48 @@ let loteEmExecucao = false;
         }
 
         function inserirBotaoLista(urlLista) {
-    if (!isPastaUrl()) return;
+            if (!isPastaUrl()) return;
 
-    const ul = localizarMenu();
-    if (!ul) return false;
+            const ul = localizarMenu();
+            if (!ul) return false;
 
-    if (document.getElementById("btnMinhaLista")) return true;
+            if (document.getElementById("btnMinhaLista")) return true;
 
     // BOTÃO UPLOAD
-    const liUpload = document.createElement("li");
-    liUpload.className = "nav-item";
+            const liUpload = document.createElement("li");
+            liUpload.className = "nav-item";
 
-    liUpload.innerHTML = `
+            liUpload.innerHTML = `
         <button id="btnUploadLote" class="ml-2 btn btn-warning fw-bold">
             Upload em Lote
         </button>
-    `;
+            `;
 
-    ul.appendChild(liUpload);
+            ul.appendChild(liUpload);
 
-    document.getElementById("btnUploadLote")
-        .addEventListener("click", iniciarUploadSequencial);
+            document.getElementById("btnUploadLote")
+            .addEventListener("click", iniciarUploadSequencial);
 
     // BOTÃO LISTA
-    const li = document.createElement("li");
-    li.className = "nav-item";
-    li.id = "btnMinhaLista";
+            const li = document.createElement("li");
+            li.className = "nav-item";
+            li.id = "btnMinhaLista";
 
-    li.innerHTML = `
+            li.innerHTML = `
         <button id="btnOpenLista" class="ml-2 btn btn-outline-light fw-bold">
             Minha Lista
         </button>
-    `;
+            `;
 
-    ul.appendChild(li);
+            ul.appendChild(li);
 
-    document.getElementById("btnOpenLista")
-        .addEventListener("click", () => {
-            chrome.runtime.sendMessage({ action: "openMinhaLista" });
-        });
+            document.getElementById("btnOpenLista")
+            .addEventListener("click", () => {
+                chrome.runtime.sendMessage({ action: "openMinhaLista" });
+            });
 
-    return true;
-}
+            return true;
+        }
 
         function esperarMenu(urlLista) {
             const menu = localizarMenu();
@@ -221,7 +235,7 @@ let loteEmExecucao = false;
             dataSalvo: new Date().toISOString()
         };
     }
-    
+
     function extractDocumentDataFromLi(li) {
 
         const codigoInput = li.querySelector('input[name="CodigoVerificador"]');
@@ -355,17 +369,18 @@ let loteEmExecucao = false;
 // SISTEMA DE UPLOAD EM LOTE PERSISTENTE
 // ==========================================================
 
-async function iniciarUploadSequencial() {
-    const seletor = document.createElement("input");
-    seletor.type = "file";
-    seletor.accept = "application/pdf";
-    seletor.multiple = true;
+    async function iniciarUploadSequencial() {
+        chrome.runtime.sendMessage({ action: "setBatchRunning", value: true });
+        const seletor = document.createElement("input");
+        seletor.type = "file";
+        seletor.accept = "application/pdf";
+        seletor.multiple = true;
 
-    seletor.onchange = async () => {
-        const files = Array.from(seletor.files);
-        if (!files.length) return;
+        seletor.onchange = async () => {
+            const files = Array.from(seletor.files);
+            if (!files.length) return;
 
-        showToast("info", "Preparando lote...");
+            showToast("info", "Preparando lote...");
         loteEmExecucao = true; // Bloqueia outras execuções automáticas
 
         const prepared = await Promise.all(files.map(async (f) => {
@@ -378,7 +393,10 @@ async function iniciarUploadSequencial() {
                 })
             };
         }));
+        loteEmExecucao = true;
 
+        chrome.runtime.sendMessage({ action: "setBatchRunning", value: true });
+        mostrarBloqueioLote("Preparando arquivos...");
         // Grava a fila no background
         chrome.runtime.sendMessage({ action: "setBatchQueue", files: prepared }, () => {
             // Após gravar, recarregamos ou chamamos a verificação
@@ -448,7 +466,7 @@ function esperarProximoCiclo() {
 
 
 
-   function esperarProcessamentoCompleto(timeout = 10000) {
+function esperarProcessamentoCompleto(timeout = 10000) {
     return new Promise(resolve => {
         let resolvido = false;
 
@@ -606,7 +624,11 @@ async function executarUploadFisico(fileData) {
 // 2. Modifique o redirecionamento para também desativar o alerta
 async function verificarCicloDeUpload() {
     // Se já houver um processo de envio a correr nesta aba, não faz nada
-    if (loteEmExecucao) return;
+    chrome.runtime.sendMessage({ action: "getBatchRunning" }, (status) => {
+        if (status?.running) {
+            mostrarBloqueioLote("Upload em lote em andamento...");
+        }
+    });
 
     const urlHome = "https://assinadordigitalexterno.praiagrande.sp.gov.br/";
     const inputUpload = document.getElementById("Arquivo");
@@ -614,12 +636,20 @@ async function verificarCicloDeUpload() {
     // Verificamos se há itens na fila SEM remover (peek)
     chrome.runtime.sendMessage({ action: "getNextBatch", peek: true }, async (peekResponse) => {
         if (!peekResponse || !peekResponse.hasItems) {
-            removerBloqueioLote();
-            return;
-        }
+
+        // 🔥 FINAL DO LOTE
+            chrome.runtime.sendMessage({ action: "setBatchRunning", value: false });
+
+        loteEmExecucao = false; // opcional, mas bom manter coerente
+        removerBloqueioLote();
+
+        console.log("✅ Lote finalizado");
+
+        return;
+    }
 
         // Se estamos na página de upload
-        if (inputUpload) {
+    if (inputUpload) {
             loteEmExecucao = true; // Marca como ocupado
             chrome.runtime.sendMessage({ action: "getNextBatch" }, async (response) => {
                 if (response && response.file) {
@@ -629,6 +659,7 @@ async function verificarCicloDeUpload() {
         } else {
             // Se não estamos na home, mas a fila existe, redireciona
             window.onbeforeunload = null; 
+            chrome.runtime.sendMessage({ action: "setBatchRunning", value: true });
             window.location.href = urlHome;
         }
     });
@@ -641,13 +672,13 @@ setTimeout(() => {
     }
 }, 3000);
 
-    setTimeout(() => {
-        if (!isPastaUrl()) return;
+setTimeout(() => {
+    if (!isPastaUrl()) return;
 
-        salvarTodosOsDocumentosDaLista();
-        observarListaDeDocumentos();
+    salvarTodosOsDocumentosDaLista();
+    observarListaDeDocumentos();
 
-    }, 800);
+}, 800);
 
 
 
