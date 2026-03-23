@@ -127,15 +127,64 @@ let listaBusca = [];      // lista completa usada pela busca (10k)
 const API_URL =
 "https://www.intra.pg/SEAD/_api/web/lists(guid'DA67FC64-1B63-4608-B859-8DE4BC9B1FD8')/items" +
 "?$filter=Finalidado eq false" +
-"&$select=Title,Link_x0020_Documento,ID,ContentType/Id,Contagem,Concluidos,Categoria,Locais,ContagemSelecionados,Calculado" +
-"&$expand=ContentType" +
+"&$select=" +
+[
+  "ID",
+  "Title",
+  "Link_x0020_Documento",
+
+  // Seus campos atuais
+  "ContentType/Id",
+  "Contagem",
+  "Concluidos",
+  "Categoria",
+  "Locais",
+  "ContagemSelecionados",
+  "Calculado",
+
+  // 🔽 NOVOS CAMPOS
+  "Created",
+  "Modified",
+  "Author/Title",
+  "Editor/Title"
+
+].join(",") +
+
+"&$expand=ContentType,Author,Editor" +
 "&$top=30000";
+
 console.log(API_URL);
 // Endpoint para busca completa (10k)
 const SEARCH_ENDPOINT =
-"https://www.intra.pg/sead/_api/web/lists/getbyID('da67fc64-1b63-4608-b859-8de4bc9b1fd8')/items?$top=30000";
+"https://www.intra.pg/SEAD/_api/web/lists/getbyID('da67fc64-1b63-4608-b859-8de4bc9b1fd8')/items" +
+"?$select=" +
+[
+  "ID",
+  "Title",
+  "Link_x0020_Documento",
 
+  // campos da lista
+  "ContentType/Id",
+  "Contagem",
+  "Concluidos",
+  "Categoria",
+  "Locais",
+  "ContagemSelecionados",
+  "Calculado",
 
+  // 🔽 autor / edição
+  "Created",
+  "Modified",
+  "Author/Title",
+  "Editor/Title"
+
+].join(",") +
+
+"&$expand=ContentType,Author,Editor" +
+"&$orderby=Modified desc" +   // 🔥 opcional (melhor UX)
+"&$top=30000";
+
+console.log(SEARCH_ENDPOINT);
 // Contêiner onde será exibida a lista (cards)
 
 
@@ -440,7 +489,7 @@ async function startRealSignaturesUpdateTabela(lista) {
 // 🔥 GARANTIDO: Aplica badge Amarelo/Warning para itens não mapeados
 // =======================================================================
 function generateAssinaturaTooltipContent(status_assinaturas, agrupadas = {}) {
-    
+
     let tooltipHtml = `<span class='d-block text-center mb-1'>SECRETARIAS</span>`;
     
     const normalize = str =>
@@ -451,29 +500,29 @@ function generateAssinaturaTooltipContent(status_assinaturas, agrupadas = {}) {
     .trim();
 
     const badgesHtml = status_assinaturas.map(status => {
-    let label = status.abreviacao || status.secretaria;
-    let type = 'secondary';
+        let label = status.abreviacao || status.secretaria;
+        let type = 'secondary';
 
-    const nomeComparacao = status.responsavel;
+        const nomeComparacao = status.responsavel;
 
-    const key = Object.keys(agrupadas).find(k =>
-        k === normalize(nomeComparacao)
-    );
+        const key = Object.keys(agrupadas).find(k =>
+            k === normalize(nomeComparacao)
+            );
 
-    if (key && agrupadas[key].count > 1) {
-        label = `${agrupadas[key].count}x ${label}`;
-    }
+        if (key && agrupadas[key].count > 1) {
+            label = `${agrupadas[key].count}x ${label}`;
+        }
 
-    if (status.responsavel === "Não mapeado (Pendente)") {
-        type = 'warning';
-    } else if (status.responsavel === "Signatário Extra") {
-        type = 'warning';
-    } else if (status.assinado) {
-        type = 'success';
-    }
+        if (status.responsavel === "Não mapeado (Pendente)") {
+            type = 'warning';
+        } else if (status.responsavel === "Signatário Extra") {
+            type = 'warning';
+        } else if (status.assinado) {
+            type = 'success';
+        }
 
-    return `<span class='badge text-bg-${type} d-inline-block me-1 mb-1'>${label}</span>`;
-}).join("");
+        return `<span class='badge text-bg-${type} d-inline-block me-1 mb-1'>${label}</span>`;
+    }).join("");
 
     // 🔥 AGORA SIM junta tudo
     tooltipHtml += badgesHtml;
@@ -1219,6 +1268,21 @@ document.getElementById('btnGerenciarGrupos')?.addEventListener('click', deletar
 // Inicialização
 atualizarSelectGrupos();
 
+
+function formatarData(dataISO) {
+    if (!dataISO) return "-";
+
+    const data = new Date(dataISO);
+
+    if (isNaN(data)) return "-";
+
+    return data.toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short"
+    });
+}
+
+
 // ===================================================
 // RENDERIZAÇÃO EM TABELA (NOVO)
 // ===================================================
@@ -1253,6 +1317,13 @@ function renderTabela(lista) {
         const classeCor = modoLixeira ? "btn-outline-danger" : "";
         const classeIdentificadora = modoLixeira ? "btn-remover-do-grupo" : "btn-adicionar-ao-grupo";
 
+        const criadoPor = doc.Author?.Title || "-";
+        const dataCriacao = doc.Created ? formatarData(doc.Created) : "-";
+
+        const editadoPor = doc.Editor?.Title || "-";
+        const dataEdicao = doc.Modified ? formatarData(doc.Modified) : "-";
+
+ 
         html += `
             <tr data-id="${idAssinador || ''}" >
                 <td class='d-none'>${doc.ID}</td>
@@ -1268,11 +1339,25 @@ function renderTabela(lista) {
 
                 </td>
 
-                <td class='fw-bold '>
+                 <td class="td-titulo position-relative fw-bold">
 
                     <a class="text-dark" href="${link || '#'}" target="_blank">
                         ${doc.Title}
                     </a>
+
+     
+    <i class="fa-solid fa-circle-info info-icon"
+       data-bs-toggle="tooltip"
+       data-bs-placement="right"
+       data-bs-html="true"
+       data-bs-title="
+         <b>Criado:</b> ${criadoPor} -
+         <b>Data:</b> ${dataCriacao}<br>
+         <hr class='m-1'>
+         <b>Editado:</b> ${editadoPor} -
+         <b>Data:</b> ${dataEdicao}
+       ">
+    </i>
 
 
                 </td>
@@ -1701,12 +1786,12 @@ renderizarOpcoesGrupos();
 
 
 function garantirGrupo(boardName) {
-   let grupos = JSON.parse(localStorage.getItem("assinador_grupos")) || {};
+ let grupos = JSON.parse(localStorage.getItem("assinador_grupos")) || {};
 
-   if (!grupos[boardName]) {
-       grupos[boardName] = [];
-       localStorage.setItem("assinador_grupos", JSON.stringify(grupos));
-   }
+ if (!grupos[boardName]) {
+     grupos[boardName] = [];
+     localStorage.setItem("assinador_grupos", JSON.stringify(grupos));
+ }
 }
 
 

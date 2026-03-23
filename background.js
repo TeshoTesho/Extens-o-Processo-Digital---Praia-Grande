@@ -12,7 +12,9 @@ const CLEANUP_ALARM_NAME = "dailyTagCleanup";
 const DAYS_TO_KEEP = 40;
 const MS_IN_DAY = 24 * 60 * 60 * 1000;
 const THRESHOLD_MS = DAYS_TO_KEEP * MS_IN_DAY;
-
+//
+let uploadQueue = [];
+let filaBatch = [];
 // Rastreia popups abertos por abas específicas
 const popupTracker = {};
 const logss = false;
@@ -288,6 +290,43 @@ case "capturarDadosCompletos": {
     return true; 
 }
 
+case "prepareBatchUpload":
+    // Recebe a lista de arquivos. Nota: Se forem muitos arquivos grandes, 
+    // o ideal seria usar IndexedDB, mas para filas pequenas, a RAM do BG resolve.
+    uploadQueue = msg.files; // msg.files deve conter { name, data (base64 ou blob) }
+    sendResponse({ status: "Fila preparada", count: uploadQueue.length });
+    break;
+
+case "getNextBatchFile":
+    if (uploadQueue.length > 0) {
+        const nextFile = uploadQueue.shift();
+        sendResponse({ file: nextFile, remaining: uploadQueue.length });
+    } else {
+        sendResponse({ file: null });
+    }
+    break;
+
+case "clearBatchQueue":
+    uploadQueue = [];
+    sendResponse({ status: "Fila limpa" });
+    break;
+    
+case "setBatchQueue":
+    filaBatch = msg.files; // Array de arquivos em Base64
+    sendResponse({ status: "Fila gravada", total: filaBatch.length });
+    break;
+
+case "getNextBatch":
+    if (msg.peek) {
+        // Apenas verifica se tem algo, sem dar shift
+        sendResponse({ hasItems: filaBatch.length > 0 });
+    } else if (filaBatch.length > 0) {
+        const next = filaBatch.shift();
+        sendResponse({ file: next, remaining: filaBatch.length });
+    } else {
+        sendResponse({ file: null });
+    }
+    break;
 
 default:
             //log("Mensagem ignorada:", msg);
