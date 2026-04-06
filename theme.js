@@ -166,46 +166,6 @@ div.form-upload, form.form-upload {
     background-color: #121212 ; /* Fundo das opções */
 }
 
-            ` : ''}
-
-        #theme-float-btn { position: fixed; bottom: 25px; right: 25px; z-index: 10000; width: 50px; height: 50px; border-radius: 50%; background: #0d6efd; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
-        #theme-panel {
-             position: fixed; bottom: 85px; right: 25px; z-index: 10000; 
-            background: ${isDark ? '#252525' : '#ffffff'}; 
-            color: ${isDark ? '#fff' : '#333'};
-            padding: 20px; border-radius: 16px; width: 260px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
-            display: none; border: 1px solid ${isDark ? '#444' : '#eee'};
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-        .panel-header { font-weight: 700; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid ${isDark ? '#444' : '#eee'}; padding-bottom: 10px; }
-        .theme-row { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
-        .switch-container { position: relative; display: inline-block; width: 42px; height: 24px; }
-        .switch-container input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #0d6efd; }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-       
-
-/* Para garantir que o ícone herde */
-.text-info-emphasis .glyphicon,
-.text-info-emphasis .fa {
-    color: inherit !important;
-}
-
-
-        /* ===============================
-   SWEETALERT THEME
-=============================== */
-
-.swal2-popup {
-    background-color: ${isDark ? theme.card : '#ffffff'} !important;
-    color: ${isDark ? theme.text : '#212529'} !important;
-    border: 1px solid ${isDark ? '#444' : '#ddd'} !important;
-    border-radius: 12px !important;
-}
 
 /* Animação de entrada */
 @keyframes swal2-show {
@@ -279,6 +239,47 @@ div.form-upload, form.form-upload {
             .task-order{
                 background-color: #121212;
             }
+
+            ` : ''}
+
+        #theme-float-btn { position: fixed; bottom: 25px; right: 25px; z-index: 10000; width: 50px; height: 50px; border-radius: 50%; background: #0d6efd; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+        #theme-panel {
+             position: fixed; bottom: 85px; right: 25px; z-index: 10000; 
+            background: ${isDark ? '#252525' : '#ffffff'}; 
+            color: ${isDark ? '#fff' : '#333'};
+            padding: 20px; border-radius: 16px; width: 260px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
+            display: none; border: 1px solid ${isDark ? '#444' : '#eee'};
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .panel-header { font-weight: 700; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid ${isDark ? '#444' : '#eee'}; padding-bottom: 10px; }
+        .theme-row { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .switch-container { position: relative; display: inline-block; width: 42px; height: 24px; }
+        .switch-container input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #0d6efd; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+       
+
+/* Para garantir que o ícone herde */
+.text-info-emphasis .glyphicon,
+.text-info-emphasis .fa {
+    color: inherit !important;
+}
+
+
+        /* ===============================
+   SWEETALERT THEME
+=============================== */
+
+.swal2-popup {
+    background-color: ${isDark ? theme.card : '#ffffff'} !important;
+    color: ${isDark ? theme.text : '#212529'} !important;
+    border: 1px solid ${isDark ? '#444' : '#ddd'} !important;
+    border-radius: 12px !important;
+}
 
 
         `;

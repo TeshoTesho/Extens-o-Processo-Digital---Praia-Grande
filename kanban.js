@@ -1115,8 +1115,10 @@ function getTwoBusinessDaysAhead() {
             ` : ''}
 
             ${formattedDate ? `
-            <br><i class="fa fa-calendar" aria-hidden="true"></i>
-            <small class="due-date">Prazo: ${formattedDate}</small>
+            <br>
+                 <small class="text-secondary text-truncate d-inline-block w-100" title="${formattedDate}">
+                <i class=" fa fa-calendar" aria-hidden="true"></i> ${formattedDate}
+            </small>
                 ` : ''}
         </div>
             `;
@@ -1438,9 +1440,8 @@ if (dataPrazo) {
          taskEl.appendChild(dueDateEl);
      }
 
-     dueDateEl.textContent = formattedDate ? `Prazo: ${formattedDate}` : "";
+  //   dueDateEl.textContent = formattedDate ? `Prazo: ${formattedDate}` : "";
  }
-
 
 
 
