@@ -1021,8 +1021,13 @@ function getTwoBusinessDaysAhead() {
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  async function renderTasks(tasks, processData) {
-
-  tasks.sort((a, b) => {
+    const storage = await new Promise(resolve => {
+        chrome.storage.local.get(['processTags', 'customTheme', 'userSettings'], resolve);
+    });
+    
+    const processTags = storage.processTags || {};
+    const isDark = storage.customTheme?.isDark || storage.userSettings?.darkMode || false;
+    tasks.sort((a, b) => {
         const strA = a.processNumber || "";
         const strB = b.processNumber || "";
 
@@ -1154,6 +1159,58 @@ function getTwoBusinessDaysAhead() {
                 ` : ''}
         </div>
             `;
+
+            // 2. ADICIONAR BOLINHAS DE TAGS
+            const tagsIndicatorContainer = document.createElement("div");
+            tagsIndicatorContainer.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 3px;
+                max-width: 40%;
+                pointer-events: none; /* Garante que o clique passe para a task */
+                        `;
+
+// 2. Filtra as tags do processo, remove as de board e ELIMINA CORES DUPLICADAS
+            const tagsForThisProcess = Object.values(processTags).filter(t => 
+                t.processId === task.processId && !t.isBoardTag
+                );
+
+// Usamos um Set para rastrear cores já adicionadas
+            const uniqueColors = new Set();
+
+            tagsForThisProcess.forEach(tag => {
+                const color = tag.color || '#ccc';
+                
+    // Se a cor já foi exibida nesta task, ignora
+                if (!uniqueColors.has(color)) {
+                    uniqueColors.add(color);
+
+                const colorSpan = document.createElement('span');
+                colorSpan.title = tag.name; // Tooltip com o nome da tag
+                colorSpan.style.cssText = `
+                    background-color: ${color};
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    border: 1px solid rgba(0,0,0,0.1);
+                    flex-shrink: 0;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+                `;
+                tagsIndicatorContainer.appendChild(colorSpan);
+    }
+});
+
+// 3. Adiciona o container à task (certifique-se de que a .task tenha position: relative)
+            taskEl.style.position = "relative"; 
+            taskEl.appendChild(tagsIndicatorContainer);
+
+            taskEl.addEventListener("click", () => openModal(task, { dataPrazo: prazo, description }));
+            taskList.appendChild(taskEl);
+
 
             taskEl.dataset.description = description;
             taskEl.addEventListener("click", () =>
