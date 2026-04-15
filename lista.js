@@ -333,7 +333,18 @@ document.addEventListener("click", function (e) {
         }
         
         console.log("Setores Marcados (Global):", setoresMarcados);
+
+
         // --------------------------------------------------------
+
+// --- NOVA LÓGICA DE DATA ---
+    const hoje = new Date();
+    const dataPrazo = new Date(hoje);
+    dataPrazo.setDate(hoje.getDate() + 7);
+
+    // Formata para DD/MM/YYYY
+    const prazoFormatado = dataPrazo.toLocaleDateString('pt-BR'); 
+    // ---------------------------
 
         const empresa = btn.dataset.empresa || '';
         const processo = btn.dataset.processo || '';
@@ -363,6 +374,7 @@ document.addEventListener("click", function (e) {
                         action: "preencher_sead",
                         titulo,
                         link,
+                        prazo: prazoFormatado,
                         setores: setoresMarcados // Usa o array capturado globalmente
                     }, (response) => {
                         if (chrome.runtime.lastError) {

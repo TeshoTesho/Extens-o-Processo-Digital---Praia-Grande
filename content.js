@@ -1048,7 +1048,62 @@ function selecionarDocumento(linha, indice, onCompleteCallback) {
 
         applyAllTags();
 
+console.log('Adicionando paginação');
+// Função interna para executar a clonagem
+ // --- LÓGICA DE PAGINAÇÃO REFORÇADA ---
+    const clonarPaginacao = () => {
+        const destino = document.getElementById('documentos-processo-interno') || document.getElementById('documentos-processo');
+        const original = document.querySelector('.paginacao-simples:not(#paginacao-clonada-footer)');
+        
+        if (!destino || !original) return;
 
+        const textoAtual = original.innerText;
+        const cloneExistente = document.getElementById('paginacao-clonada-footer');
+
+        if (!cloneExistente || cloneExistente.dataset.originalText !== textoAtual) {
+            cloneExistente?.remove();
+
+            const clone = original.cloneNode(true);
+            clone.id = 'paginacao-clonada-footer';
+            clone.classList.add('justify-content-end');
+            clone.dataset.originalText = textoAtual;
+            
+            // CSS AJUSTADO PARA ALINHAMENTO À DIREITA
+            clone.style.cssText = `
+                margin-top: 25px !important;
+                border-top: 1px solid #ddd !important;
+                padding-top: 15px !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
+                gap: 10px !important;
+                width: 100% !important;
+                clear: both !important;
+            `;
+
+            destino.appendChild(clone);
+
+            // Sincroniza cliques
+            clone.querySelectorAll('a[page-documento-processo]').forEach((btn, idx) => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const originais = document.querySelectorAll('.paginacao-simples:not(#paginacao-clonada-footer) a[page-documento-processo]');
+                    if (originais[idx]) originais[idx].click();
+                };
+            });
+        }
+    };
+
+    // Mantemos os gatilhos de atualização
+    const paginacaoInterval = setInterval(clonarPaginacao, 1000);
+    setTimeout(() => clearInterval(paginacaoInterval), 10000);
+
+    const containerParaObservar = document.getElementById('documentos-processo') || document.body;
+    if (containerParaObservar && !containerParaObservar.dataset.observerPaginacaoSet) {
+        const observer = new MutationObserver(() => clonarPaginacao());
+        observer.observe(containerParaObservar, { childList: true, subtree: true, characterData: true });
+        containerParaObservar.dataset.observerPaginacaoSet = "true";
+    }
 
     }
 
