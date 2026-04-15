@@ -1021,7 +1021,39 @@ function getTwoBusinessDaysAhead() {
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  async function renderTasks(tasks, processData) {
-    // limpa listas
+
+  tasks.sort((a, b) => {
+        const strA = a.processNumber || "";
+        const strB = b.processNumber || "";
+
+        // Função interna para quebrar e limpar o número do processo
+        const parseProcess = (text) => {
+            // Separa em: [Número, Ano e Volume] usando a barra e o hífen como divisores
+            const parts = text.split(/[/|-]/); 
+            return parts.map(p => {
+                const numeric = p.replace(/\D/g, ''); // Remove letras/pontos (ex: "38.081" -> "38081")
+                return numeric ? parseInt(numeric, 10) : 0;
+            });
+        };
+
+        const valA = parseProcess(strA); // Retorno ex: [38081, 2022, 2]
+        const valB = parseProcess(strB);
+
+        // 1. Desempate pelo NÚMERO (antes da barra)
+        if (valA[0] !== valB[0]) return valA[0] - valB[0];
+
+        // 2. Desempate pelo ANO (entre barra e hífen)
+        if (valA[1] !== valB[1]) return valA[1] - valB[1];
+
+        // 3. Desempate pelo VOLUME/ANEXO (depois do hífen)
+        if (valA[2] !== valB[2]) return valA[2] - valB[2];
+
+        // 4. Fallback final (ordem alfabética simples se tudo for igual)
+        return strA.localeCompare(strB, undefined, { numeric: true });
+    });
+    // ------------------------------------------
+
+    // Limpa as listas existentes antes de renderizar
     document.querySelectorAll(".task-list").forEach(l => l.innerHTML = "");
 
     // helper: normaliza nomes (remove acentos, minuscula, trim)
