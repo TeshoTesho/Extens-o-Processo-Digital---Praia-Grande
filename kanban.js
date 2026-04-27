@@ -1021,44 +1021,7 @@ function getTwoBusinessDaysAhead() {
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  // RENDER TASKS em seus boards (usando processData para board e dataprazo/description)
  async function renderTasks(tasks, processData) {
-    const storage = await new Promise(resolve => {
-        chrome.storage.local.get(['processTags', 'customTheme', 'userSettings'], resolve);
-    });
-    
-    const processTags = storage.processTags || {};
-    const isDark = storage.customTheme?.isDark || storage.userSettings?.darkMode || false;
-    tasks.sort((a, b) => {
-        const strA = a.processNumber || "";
-        const strB = b.processNumber || "";
-
-        // Função interna para quebrar e limpar o número do processo
-        const parseProcess = (text) => {
-            // Separa em: [Número, Ano e Volume] usando a barra e o hífen como divisores
-            const parts = text.split(/[/|-]/); 
-            return parts.map(p => {
-                const numeric = p.replace(/\D/g, ''); // Remove letras/pontos (ex: "38.081" -> "38081")
-                return numeric ? parseInt(numeric, 10) : 0;
-            });
-        };
-
-        const valA = parseProcess(strA); // Retorno ex: [38081, 2022, 2]
-        const valB = parseProcess(strB);
-
-        // 1. Desempate pelo NÚMERO (antes da barra)
-        if (valA[0] !== valB[0]) return valA[0] - valB[0];
-
-        // 2. Desempate pelo ANO (entre barra e hífen)
-        if (valA[1] !== valB[1]) return valA[1] - valB[1];
-
-        // 3. Desempate pelo VOLUME/ANEXO (depois do hífen)
-        if (valA[2] !== valB[2]) return valA[2] - valB[2];
-
-        // 4. Fallback final (ordem alfabética simples se tudo for igual)
-        return strA.localeCompare(strB, undefined, { numeric: true });
-    });
-    // ------------------------------------------
-
-    // Limpa as listas existentes antes de renderizar
+    // limpa listas
     document.querySelectorAll(".task-list").forEach(l => l.innerHTML = "");
 
     // helper: normaliza nomes (remove acentos, minuscula, trim)
@@ -1152,65 +1115,11 @@ function getTwoBusinessDaysAhead() {
             ` : ''}
 
             ${formattedDate ? `
-            <br>
-                 <small class="text-secondary text-truncate d-inline-block w-100" title="${formattedDate}">
-                <i class=" fa fa-calendar" aria-hidden="true"></i> ${formattedDate}
-            </small>
+            <br><i class="fa fa-calendar" aria-hidden="true"></i>
+            <small class="due-date">Prazo: ${formattedDate}</small>
                 ` : ''}
         </div>
             `;
-
-            // 2. ADICIONAR BOLINHAS DE TAGS
-            const tagsIndicatorContainer = document.createElement("div");
-            tagsIndicatorContainer.style.cssText = `
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-end;
-                gap: 3px;
-                max-width: 40%;
-                pointer-events: none; /* Garante que o clique passe para a task */
-                        `;
-
-// 2. Filtra as tags do processo, remove as de board e ELIMINA CORES DUPLICADAS
-            const tagsForThisProcess = Object.values(processTags).filter(t => 
-                t.processId === task.processId && !t.isBoardTag
-                );
-
-// Usamos um Set para rastrear cores já adicionadas
-            const uniqueColors = new Set();
-
-            tagsForThisProcess.forEach(tag => {
-                const color = tag.color || '#ccc';
-                
-    // Se a cor já foi exibida nesta task, ignora
-                if (!uniqueColors.has(color)) {
-                    uniqueColors.add(color);
-
-                const colorSpan = document.createElement('span');
-                colorSpan.title = tag.name; // Tooltip com o nome da tag
-                colorSpan.style.cssText = `
-                    background-color: ${color};
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    border: 1px solid rgba(0,0,0,0.1);
-                    flex-shrink: 0;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-                `;
-                tagsIndicatorContainer.appendChild(colorSpan);
-    }
-});
-
-// 3. Adiciona o container à task (certifique-se de que a .task tenha position: relative)
-            taskEl.style.position = "relative"; 
-            taskEl.appendChild(tagsIndicatorContainer);
-
-            taskEl.addEventListener("click", () => openModal(task, { dataPrazo: prazo, description }));
-            taskList.appendChild(taskEl);
-
 
             taskEl.dataset.description = description;
             taskEl.addEventListener("click", () =>
@@ -1529,8 +1438,9 @@ if (dataPrazo) {
          taskEl.appendChild(dueDateEl);
      }
 
-  //   dueDateEl.textContent = formattedDate ? `Prazo: ${formattedDate}` : "";
+     dueDateEl.textContent = formattedDate ? `Prazo: ${formattedDate}` : "";
  }
+
 
 
 

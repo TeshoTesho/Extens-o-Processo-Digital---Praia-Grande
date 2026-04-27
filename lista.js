@@ -479,8 +479,34 @@ document.addEventListener("DOMContentLoaded", function() {
             selectAllBtn.classList.toggle('btn-outline-danger', allChecked);
         });
     }
+    renderizarCheckboxes();
+
 });
 
+function renderizarCheckboxes() {
+    const container = document.getElementById('container-checkboxes-dinamicas');
+    if (!container || typeof secretarias === 'undefined') return;
+
+    // Limpa o container antes de renderizar
+    container.innerHTML = '';
+
+    secretarias.forEach((sec) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 col-sm-6';
+
+        col.innerHTML = `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" 
+                       value="${sec.abreviacao}" 
+                       id="check${sec.abreviacao.replace(/\s+/g, '')}">
+                <label class="form-check-label" for="check${sec.abreviacao.replace(/\s+/g, '')}">
+                    ${sec.abreviacao}
+                </label>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
 
         /**
          * Carrega e exibe a lista de documentos.
