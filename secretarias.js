@@ -1,8 +1,9 @@
 
 // Contêiner onde será exibida a lista (cards)
 const secretarias = [
+    //{ abreviacao: "GP", secretaria: "Gabinete do Prefeito", nome: "KATSU YONAMINE", cargo: "Secretário Municipal de Governo Interino", cpf: "927.188.418-34", texto: "Secretário Municipal de Governo Interino, por atribuição conferida através do artigo 22, inciso VIII" },
     { abreviacao: "GP", secretaria: "Gabinete do Prefeito", nome: "REINALDO MOREIRA BRUNO", cargo: "Secretário Municipal Geral de Gabinete do Prefeito", cpf: "837.438.808-06", texto: "titular da Secretaria Geral de Gabinete do Prefeito, por atribuição conferida através do artigo 12-A" },
-    { abreviacao: "SEG", secretaria: "Secretaria de Governo", nome: "KATSU YONAMINE", cargo: "Secretário Municipal de Governo Interino", cpf: "927.188.418-34", texto: "Secretário Municipal de Governo Interino, por atribuição conferida através do artigo 22, inciso VIII" },
+    { abreviacao: "SEG", secretaria: "Secretaria de Governo", nome: "ALEXANDRE GALLO RODRIGUES", cargo: "Secretário Municipal de Governo", cpf: "189.301.658-77", texto: "Secretário Municipal de Governo, por atribuição conferida através do artigo 22, inciso VIII" },
     { abreviacao: "SEPLAN", secretaria: "Secretaria de Planejamento", nome: "JOSIE YABUTA DE LIMA HOLLANDA", cargo: "Secretária Municipal de Planejamento", cpf: "300.105.098-52", texto: "titular da Secretaria de Planejamento, por atribuição conferida através do artigo 25, inciso XV" },
     { abreviacao: "SEASP", secretaria: "Secretaria de Assuntos de Segurança Pública", nome: "MAURICIO VIEIRA IZUMI", cargo: "Secretário Municipal de Assuntos de Segurança Pública", cpf: "130.501.278-05", texto: "titular da Secretaria de Assuntos de Segurança Pública, por atribuição conferida através do artigo 28, inciso XIII" },
     { abreviacao: "SEAD", secretaria: "Secretaria de Administração", nome: "RONALDO FERREIRA DE ALCÂNTARA", cargo: "Secretário Municipal de Administração Interino", cpf: "121.247.468-63", texto: "Secretário Municipal de Administração Interino, por atribuição conferida através do inciso XVIII do artigo 31" },

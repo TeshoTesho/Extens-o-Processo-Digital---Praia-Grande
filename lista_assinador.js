@@ -264,9 +264,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Listener para o Select de Grupos
-    const selectGrupo = document.getElementById("selectGrupo");
-    if (selectGrupo) {
-        selectGrupo.addEventListener("change", filtrarPorGrupo);
+    const selectMisto = document.getElementById("selectGrupo"); 
+    if (selectMisto) {
+    // Agora o mesmo select cuida de TUDO
+        selectMisto.addEventListener("change", filtrarMisto);
     }
 
 });
@@ -987,15 +988,15 @@ async function renderLista(lista, isInitialLoad = true) {
                 <i class="fa fa-cog"></i>
             </a>
         `;
-        const grupoAtivo = document.getElementById("selectGrupo")?.value || "todos";
-        const isRemover = grupoAtivo !== "todos";
+        const valorFiltro = document.getElementById("selectGrupo")?.value || "todos";
+// Só mostra o botão de remover se o filtro começar explicitamente com "grupo:"
+        const isModoGrupo = valorFiltro.startsWith("grupo:");
 
-// No HTML do botão:
         const botaoGrupo = `
-    <button class="btn ${isRemover ? 'btn-outline-danger' : ''} btn-sm" 
-            onclick="${isRemover ? `removerProcessoDoGrupo('${doc.ID}')` : `adicionarProcessoAoGrupo('${doc.ID}')`}"
-            title="${isRemover ? 'Remover deste grupo' : 'Adicionar a um grupo'}">
-        <i class="fa ${isRemover ? 'fa-trash' : 'fa-folder-plus'}"></i>
+    <button class="btn ${isModoGrupo ? 'btn-outline-danger' : ''} btn-sm" 
+            onclick="${isModoGrupo ? `removerProcessoDoGrupo('${doc.ID}')` : `adicionarProcessoAoGrupo('${doc.ID}')`}"
+            title="${isModoGrupo ? 'Remover deste grupo' : 'Adicionar a um grupo'}">
+        <i class="fa ${isModoGrupo ? 'fa-trash' : 'fa-folder-plus'}"></i>
     </button>
         `;
 
@@ -1038,6 +1039,75 @@ async function renderLista(lista, isInitialLoad = true) {
     }
 }
 
+//CRIADORES - GRUPOS - FILTROS
+
+
+//FILTROS MISTOS
+function renderizarOpcoesMistas() {
+    const select = document.getElementById("selectGrupo"); // Usando o select que você já tem
+    if (!select) return;
+
+    const listaGrupos = obterGrupos();
+    const criadores = [...new Set(todosDocumentos.map(doc => doc.Author?.Title?.split(/ - | RF/i)[0].trim()).filter(Boolean))].sort();
+
+    let html = '<option value="todos">📁 Todos os Documentos</option>';
+
+    // Seção de Grupos
+    html += '<optgroup label="Seus Grupos">';
+    for (const nome in listaGrupos) {
+        const qtd = listaGrupos[nome].length;
+        html += `<option value="grupo:${nome}">📂 ${nome} (${qtd})</option>`;
+    }
+    html += '</optgroup>';
+
+    // Seção de Criadores
+    html += '<optgroup label="Filtrar por Criador">';
+    criadores.forEach(nome => {
+        html += `<option value="criador:${nome}">👤 ${nome}</option>`;
+    });
+    html += '</optgroup>';
+
+    select.innerHTML = html;
+}
+
+async function filtrarMisto() {
+    const select = document.getElementById("selectGrupo");
+    const valorSelecionado = select.value;
+
+    if (valorSelecionado === "todos") {
+        aplicarModoVisualizacao(todosDocumentos, false);
+        return;
+    }
+
+    showLoading();
+    let filtrados = [];
+
+    if (valorSelecionado.startsWith("grupo:")) {
+        const nomeGrupo = valorSelecionado.replace("grupo:", "");
+        const listaGrupos = obterGrupos();
+        const idsNoGrupo = (listaGrupos[nomeGrupo] || []).map(id => String(id));
+        
+        filtrados = todosDocumentos.filter(doc => idsNoGrupo.includes(String(doc.ID)));
+        
+        if (filtrados.length < idsNoGrupo.length) {
+            const listaCache = await buscarListaCompleta();
+            filtrados = listaCache.filter(doc => idsNoGrupo.includes(String(doc.ID)));
+        }
+    } else if (valorSelecionado.startsWith("criador:")) {
+        const nomeCriador = valorSelecionado.replace("criador:", "");
+        // Filtra os documentos originais pelo nome do autor
+        filtrados = todosDocumentos.filter(doc => {
+            const nomeBruto = doc.Author?.Title || "";
+            return nomeBruto.includes(nomeCriador);
+        });
+    }
+
+    // A função aplicarModoVisualizacao chamará renderTabela/renderLista 
+    // que agora já possuem a lógica correta para checar o prefixo "grupo:"
+    aplicarModoVisualizacao(filtrados, false);
+    hideLoading();
+}
+
 // ================================================
 // GERENCIAMENTO DE GRUPOS
 // ================================================
@@ -1063,7 +1133,7 @@ function salvarGrupos(novosGrupos) {
     const dadoSeguro = (novosGrupos && typeof novosGrupos === 'object') ? novosGrupos : {};
     
     localStorage.setItem("assinador_grupos", JSON.stringify(dadoSeguro));
-    renderizarOpcoesGrupos(); // Atualiza o select na hora
+    renderizarOpcoesMistas();
 }
 
 function atualizarSelectGrupos() {
@@ -1082,25 +1152,6 @@ function atualizarSelectGrupos() {
     select.value = valorAtual;
 }
 
-function renderizarOpcoesGrupos() {
-    const select = document.getElementById("selectGrupo");
-    if (!select) return;
-    
-    const listaGrupos = obterGrupos();
-    const valorAtual = select.value;
-    
-    let html = '<option value="todos">📁 Todos os Documentos</option>';
-    for (const nome in listaGrupos) {
-        // CORREÇÃO DEFINITIVA: length (sem erros de digitação)
-        const qtd = listaGrupos[nome].length; 
-        html += `<option value="${nome}">📂 ${nome} (${qtd})</option>`;
-    }
-    select.innerHTML = html;
-    // Tenta manter a seleção após renderizar
-    if (listaGrupos[valorAtual] || valorAtual === "todos") {
-        select.value = valorAtual;
-    }
-}
 // --- Funções de Interface ---
 
 async function criarNovoGrupo() {
@@ -1129,7 +1180,7 @@ async function criarNovoGrupo() {
         const select = document.getElementById("selectGrupo");
         if (select) {
             select.value = nomeGrupo;
-            filtrarPorGrupo();
+            filtrarMisto();
         }
     }
 }
@@ -1160,7 +1211,7 @@ async function deletarGrupoAtual() {
         salvarGrupos(grupos); // Salva o que restou
         
         select.value = "todos";
-        filtrarPorGrupo();
+        filtrarMisto();
         showToast("success", "Grupo removido.");
     }
 }
@@ -1201,7 +1252,7 @@ async function adicionarProcessoAoGrupo(idDoc) {
             
             // Se estivermos vendo um grupo, atualiza a tela
             if (document.getElementById("selectGrupo").value !== "todos") {
-                filtrarPorGrupo();
+                filtrarMisto();
             }
         } else {
             showToast("info", "Este processo já está no grupo.");
@@ -1235,7 +1286,7 @@ async function removerProcessoDoGrupo(idDoc) {
             
             // Atualiza o select (contagem) e a lista na tela
             renderizarOpcoesGrupos();
-            filtrarPorGrupo(); 
+            filtrarMisto(); 
             
             showToast("success", "Removido do grupo");
         }
@@ -1256,7 +1307,7 @@ document.addEventListener('click', function(e) {
 
 
 // Listener do Select
-document.getElementById("selectGrupo")?.addEventListener("change", filtrarPorGrupo);
+document.getElementById("selectGrupo")?.addEventListener("change", filtrarMisto);
 
 // Listener para criar e apagar
 document.getElementById('btnCriarGrupo')?.addEventListener('click', criarNovoGrupo);
@@ -1309,8 +1360,9 @@ function renderTabela(lista) {
 
         const link = sanitizeLinkField(doc.Link_x0020_Documento);
         const idAssinador = extrairIdAssinador(link);
-        const grupoSelecionado = document.getElementById("selectGrupo")?.value || "todos";
-        const modoLixeira = grupoSelecionado !== "todos";
+        const valorFiltroTabela = document.getElementById("selectGrupo")?.value || "todos";
+// Verifica se o filtro ativo é de fato um GRUPO
+        const modoLixeira = valorFiltroTabela.startsWith("grupo:");
 
 // Define ícone e cor
         const iconeAcao = modoLixeira ? "fa-trash" : "fa-folder-plus";
@@ -1323,7 +1375,7 @@ function renderTabela(lista) {
         const editadoPor = doc.Editor?.Title || "-";
         const dataEdicao = doc.Modified ? formatarData(doc.Modified) : "-";
 
- 
+
         html += `
             <tr data-id="${idAssinador || ''}" >
                 <td class='d-none'>${doc.ID}</td>
@@ -1345,7 +1397,7 @@ function renderTabela(lista) {
                         ${doc.Title}
                     </a>
 
-     
+
     <i class="fa-solid fa-circle-info info-icon"
        data-bs-toggle="tooltip"
        data-bs-placement="right"
@@ -1546,6 +1598,18 @@ async function executarBusca(termoManual = null) {
 
         return tituloLimpo.includes(valorLimpo) || idString.includes(valorLimpo);
     });
+    const filtroAtivo = document.getElementById("selectGrupo")?.value;
+    if (filtroAtivo && filtroAtivo !== "todos") {
+        if (filtroAtivo.startsWith("criador:")) {
+            const nomeCriador = filtroAtivo.replace("criador:", "");
+            resultados = resultados.filter(doc => doc.Author?.Title?.includes(nomeCriador));
+        } else if (filtroAtivo.startsWith("grupo:")) {
+            const nomeGrupo = filtroAtivo.replace("grupo:", "");
+            const grupos = obterGrupos();
+            const idsNoGrupo = (grupos[nomeGrupo] || []).map(id => String(id));
+            resultados = resultados.filter(doc => idsNoGrupo.includes(String(doc.ID)));
+        }
+    }
 
     aplicarModoVisualizacao(resultados, false);
     hideLoading();
@@ -1601,6 +1665,7 @@ async function loadAssinador() {
     hideLoading();
     ligarToggleButton();
     //console.log(todosDocumentos);
+    renderizarOpcoesMistas();
     aplicarModoVisualizacao(todosDocumentos, true);
 
 // 🚀 PRÉ-CARREGA A LISTA COMPLETA EM BACKGROUND PARA ACELERAR AS BUSCAS
@@ -1698,9 +1763,7 @@ if (buscaInput) {
     console.warn("Campo de busca (#Busca) não encontrado — eventos não foram ligados.");
 }
 
-// start
-// Após carregar dados, renderiza baseado no modo salvo
-loadAssinador();
+
 
 // Verifica se existe o parâmetro 'busca' na URL (Ex: lista.html?busca=123.456)
 async function verificarParametrosURL() {
@@ -1715,83 +1778,23 @@ async function verificarParametrosURL() {
     }
 }
 
-// Chame a função após o load inicial
+
 loadAssinador().then(() => {
     verificarParametrosURL();
 });
 
 
 
-// Função para filtrar e exibir
-async function filtrarPorGrupo() {
-    const select = document.getElementById("selectGrupo");
-    if (!select) return;
 
-    const grupoSelecionado = select.value;
-    
-    if (grupoSelecionado === "todos") {
-        aplicarModoVisualizacao(todosDocumentos, false);
-        return;
-    }
-
-    const listaGrupos = obterGrupos();
-    // Garante que idsNoGrupo seja sempre um Array de Strings
-    const idsNoGrupo = (listaGrupos[grupoSelecionado] || []).map(id => String(id));
-
-    if (idsNoGrupo.length === 0) {
-        documentsList.innerHTML = `
-            <div class="col-12 text-center mt-5 text-muted">
-                <i class="fa fa-folder-open fa-3x"></i>
-                <p class="mt-2">Este grupo está vazio.</p>
-        </div>`;
-        atualizarContagem(0);
-        return;
-    }
-
-    showLoading();
-
-    // 1. Busca rápida na memória
-    let filtrados = todosDocumentos.filter(doc => idsNoGrupo.includes(String(doc.ID)));
-
-    // 2. BUSCA NO CACHE (IndexedDB) - Se faltar algum ID da lista do grupo
-    if (filtrados.length < idsNoGrupo.length) {
-        // buscarListaCompleta() já lê do seu IndexedDB conforme seu arquivo
-        const listaCache = await buscarListaCompleta(); 
-        filtrados = listaCache.filter(doc => idsNoGrupo.includes(String(doc.ID)));
-    }
-
-    aplicarModoVisualizacao(filtrados, false);
-    hideLoading();
-}
-
-
-function renderizarOpcoesGrupos() {
-    const select = document.getElementById("selectGrupo");
-    if (!select) return;
-    
-    const grupos = obterGrupos();
-    const valorAtual = select.value;
-    
-    let html = '<option value="todos">📁 Todos os Documentos</option>';
-    for (const nome in grupos) {
-        // Correção do erro de digitação: .length
-        const quantidade = grupos[nome].length; 
-        html += `<option value="${nome}">📂 ${nome} (${quantidade})</option>`;
-    }
-    select.innerHTML = html;
-    select.value = valorAtual;
-}
-// Inicializa o select ao carregar
-renderizarOpcoesGrupos();
 
 
 function garantirGrupo(boardName) {
- let grupos = JSON.parse(localStorage.getItem("assinador_grupos")) || {};
+   let grupos = JSON.parse(localStorage.getItem("assinador_grupos")) || {};
 
- if (!grupos[boardName]) {
-     grupos[boardName] = [];
-     localStorage.setItem("assinador_grupos", JSON.stringify(grupos));
- }
+   if (!grupos[boardName]) {
+       grupos[boardName] = [];
+       localStorage.setItem("assinador_grupos", JSON.stringify(grupos));
+   }
 }
 
 
