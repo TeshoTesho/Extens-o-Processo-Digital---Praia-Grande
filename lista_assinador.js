@@ -250,16 +250,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (container) {
         container.addEventListener("click", (e) => {
             // Verifica se clicou no botão ou no ícone dentro dele
-            const btnAdd = e.target.closest(".btn-adicionar-ao-grupo");
-            const btnRem = e.target.closest(".btn-remover-do-grupo");
+            const btnAdd = e.target.closest(".btn-adicionar-ao-grupo, .btn-add-grupo");
+        const btnRem = e.target.closest(".btn-remover-do-grupo, .btn-rem-grupo");
 
             if (btnAdd) {
-                const id = btnAdd.getAttribute("data-id");
-                adicionarProcessoAoGrupo(id);
-            } else if (btnRem) {
-                const id = btnRem.getAttribute("data-id");
-                removerProcessoDoGrupo(id);
-            }
+            e.preventDefault();
+            const id = btnAdd.getAttribute("data-id");
+            adicionarProcessoAoGrupo(id);
+        } else if (btnRem) {
+            e.preventDefault();
+            const id = btnRem.getAttribute("data-id");
+            removerProcessoDoGrupo(id);
+        }
         });
     }
 
@@ -1270,12 +1272,18 @@ async function adicionarProcessoAoGrupo(idDoc) {
 }
 
 async function removerProcessoDoGrupo(idDoc) {
-    const grupoNome = document.getElementById("selectGrupo").value;
-    if (grupoNome === "todos") return;
+    const select = document.getElementById("selectGrupo");
+    let valorSelecionado = select ? select.value : "todos";
+    
+    // Se não estiver em um modo de grupo, não há o que remover "do grupo"
+    if (!valorSelecionado.startsWith("grupo:")) return;
+
+    // Extrai o nome real (ex: "grupo:TESTE" vira "TESTE")
+    const nomeGrupo = valorSelecionado.replace("grupo:", "");
 
     const { isConfirmed } = await Swal.fire({
         title: 'Remover do grupo?',
-        text: `Remover este processo de "${grupoNome}"?`,
+        text: `Remover este processo de "${nomeGrupo}"?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -1283,19 +1291,20 @@ async function removerProcessoDoGrupo(idDoc) {
     });
 
     if (isConfirmed) {
-        let grupos = obterGrupos();
+        let gruposAtuais = obterGrupos();
         const idStr = String(idDoc);
 
-        if (grupos[grupoNome]) {
-            // Remove apenas o ID clicado
-            grupos[grupoNome] = grupos[grupoNome].filter(id => String(id) !== idStr);
+        if (gruposAtuais[nomeGrupo]) {
+            // Filtra a lista removendo o ID
+            gruposAtuais[nomeGrupo] = gruposAtuais[nomeGrupo].filter(id => String(id) !== idStr);
             
-            // Salva de forma segura
-            localStorage.setItem("assinador_grupos", JSON.stringify(grupos));
+            // Salva no localStorage
+            localStorage.setItem("assinador_grupos", JSON.stringify(gruposAtuais));
             
-            // Atualiza o select (contagem) e a lista na tela
-            renderizarOpcoesGrupos();
-            filtrarMisto(); 
+            // Atualiza a interface
+            renderizarOpcoesMistas(); // Atualiza contadores no select
+            select.value = valorSelecionado; // Mantém o grupo selecionado
+            filtrarMisto(); // Recarrega a lista na tela
             
             showToast("success", "Removido do grupo");
         }
