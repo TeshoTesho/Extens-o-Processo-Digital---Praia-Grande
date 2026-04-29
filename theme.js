@@ -240,6 +240,44 @@ div.form-upload, form.form-upload {
                 background-color: #121212;
             }
 
+            .swal2-icon {
+    border-width: 4px !important;
+}
+
+/* Fix específico para o ícone de ERROR (X) */
+.swal2-icon.swal2-error {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Força as linhas do X a ficarem centralizadas e visíveis */
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important; /* Centraliza verticalmente */
+    height: 5px !important;
+    width: 47px !important;
+    background-color: #dc3545 !important;
+    margin-top: -2px !important; /* Ajuste fino para o centro real */
+}
+
+.swal2-x-mark-line-left {
+    left: 17px !important;
+    transform: rotate(45deg) !important;
+}
+
+.swal2-x-mark-line-right {
+    right: 17px !important;
+    transform: rotate(-45deg) !important;
+}
+
+/* Garante que o ícone de SUCCESS também não quebre */
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #28a745 !important;
+}
+            
+
             ` : ''}
 
         #theme-float-btn { position: fixed; bottom: 25px; right: 25px; z-index: 10000; width: 50px; height: 50px; border-radius: 50%; background: #0d6efd; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
@@ -804,6 +842,8 @@ footer.layout-principal-rodape.rodape.simples {
 .link-anexo{
                 background-color:#453f3f;
 }
+
+
 
 
 

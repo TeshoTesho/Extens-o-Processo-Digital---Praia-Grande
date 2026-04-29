@@ -1188,16 +1188,25 @@ async function criarNovoGrupo() {
 
 async function deletarGrupoAtual() {
     const select = document.getElementById("selectGrupo");
-    const grupoParaDeletar = select.value;
+    const valorSelecionado = select.value;
 
-    if (!grupoParaDeletar || grupoParaDeletar === "todos") {
-        Swal.fire('Ops', 'Selecione um grupo válido para excluir.', 'warning');
+    // 🚨 VALIDAÇÃO: Impede excluir "Todos" ou filtros de "Criador"
+    if (!valorSelecionado || valorSelecionado === "todos" || valorSelecionado.startsWith("criador:")) {
+        Swal.fire({
+            title: 'Não é possível excluir',
+            text: 'Você só pode excluir grupos criados por você, não filtros de sistema ou criadores.',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+        });
         return;
     }
 
+    // Extrai o nome real do grupo (remove o prefixo "grupo:")
+    const nomeGrupo = valorSelecionado.replace("grupo:", "");
+
     const { isConfirmed } = await Swal.fire({
-        title: `Excluir "${grupoParaDeletar}"?`,
-        text: "Os processos não serão apagados, apenas o grupo.",
+        title: `Excluir "${nomeGrupo}"?`,
+        text: "Os processos não serão apagados, apenas a pasta do grupo.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -1206,9 +1215,9 @@ async function deletarGrupoAtual() {
 
     if (isConfirmed) {
         const grupos = obterGrupos();
-        delete grupos[grupoParaDeletar]; // Remove a chave do objeto
+        delete grupos[nomeGrupo]; // Remove apenas o grupo do localStorage
         
-        salvarGrupos(grupos); // Salva o que restou
+        salvarGrupos(grupos); // Atualiza o cache e o select[cite: 2]
         
         select.value = "todos";
         filtrarMisto();
